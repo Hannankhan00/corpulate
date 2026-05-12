@@ -1,26 +1,122 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Surfaces ─────────────────────────────────────── */
+  --color-base:     #0A0C1E;   /* page background */
+  --color-surface:  #12152E;   /* sidebar, cards */
+  --color-elevated: #1C1F3E;   /* inputs, dropdowns */
+  --color-overlay:  #242748;   /* modals, popovers */
+
+  /* ── Text ─────────────────────────────────────────── */
+  --color-fg:         #FFFFFF;
+  --color-fg-sub:     #B4B4D4;  /* secondary labels */
+  --color-fg-muted:   #6B6B9A;  /* placeholders, captions */
+
+  /* ── Brand / Logo gradient ────────────────────────── */
+  --color-brand-cyan:   #06B6D4;
+  --color-brand-purple: #7C3AED;
+
+  /* ── CTA gradient (buttons, highlights) ───────────── */
+  --color-cta-from: #F03E8A;   /* hot pink */
+  --color-cta-to:   #7B2FEB;   /* violet */
+
+  /* ── Sidebar / nav states ─────────────────────────── */
+  --color-nav-active-bg:   #1E1C4B;
+  --color-nav-active-text: #FFFFFF;
+  --color-nav-idle-text:   #8B8BAD;
+
+  /* ── Notification banner ──────────────────────────── */
+  --color-banner-bg:   #1E1B4B;
+  --color-banner-text: #C4B5FD;
+
+  /* ── Borders ──────────────────────────────────────── */
+  --color-border-subtle:  #2A2A50;
+  --color-border-default: #3D3D6B;
+
+  /* ── Semantic states ──────────────────────────────── */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error:   #EF4444;
+  --color-info:    #3B82F6;
+
+  /* ── Gradients (ready-made values for use in CSS) ─── */
+  --gradient-brand: linear-gradient(135deg, var(--color-brand-cyan), var(--color-brand-purple));
+  --gradient-cta:   linear-gradient(135deg, var(--color-cta-from), var(--color-cta-to));
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* surfaces */
+  --color-base:     var(--color-base);
+  --color-surface:  var(--color-surface);
+  --color-elevated: var(--color-elevated);
+  --color-overlay:  var(--color-overlay);
+
+  /* text */
+  --color-fg:       var(--color-fg);
+  --color-fg-sub:   var(--color-fg-sub);
+  --color-fg-muted: var(--color-fg-muted);
+
+  /* brand */
+  --color-brand-cyan:   var(--color-brand-cyan);
+  --color-brand-purple: var(--color-brand-purple);
+
+  /* cta */
+  --color-cta-from: var(--color-cta-from);
+  --color-cta-to:   var(--color-cta-to);
+
+  /* nav */
+  --color-nav-active-bg:   var(--color-nav-active-bg);
+  --color-nav-active-text: var(--color-nav-active-text);
+  --color-nav-idle-text:   var(--color-nav-idle-text);
+
+  /* banner */
+  --color-banner-bg:   var(--color-banner-bg);
+  --color-banner-text: var(--color-banner-text);
+
+  /* borders */
+  --color-border-subtle:  var(--color-border-subtle);
+  --color-border-default: var(--color-border-default);
+
+  /* semantic */
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error:   var(--color-error);
+  --color-info:    var(--color-info);
+
+  /* fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: var(--color-base);
+  color: var(--color-fg);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Utility: gradient text ───────────────────────────── */
+.text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-cta {
+  background: var(--gradient-cta);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Utility: gradient button ─────────────────────────── */
+.btn-cta {
+  background: var(--gradient-cta);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cta:hover {
+  opacity: 0.88;
 }
