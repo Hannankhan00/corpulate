@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  SUPPORT
+}
+
+enum OnboardingField {
+  DATE_OF_BIRTH
+  FATHER_NAME
+  MOTHER_NAME
+  ADDRESS
+  PASSPORT_NUMBER
+  NATIONAL_ID
+  SSN
+  TAX_ID
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(SUPPORT)
+  isActive     Boolean   @default(true)
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model User {
+  id           String        @id @default(cuid())
+  firstName    String
+  lastName     String
+  email        String        @unique
+  phone          String?
+  streetAddress  String?
+  city           String?
+  province       String?
+  postalCode     String?
+  addressCountry String?
+  dateOfBirth    String?
+  fatherName     String?
+  motherName     String?
+  passportNumber String?
+  nationalId     String?
+  ssn            String?
+  taxId          String?
+  passwordHash String?
+  provider     String?
+  providerId   String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+
+  @@index([provider, providerId])
+}
+
+model Application {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  companyName   String?
+  description   String?  @db.Text
+  industry      String?
+  revenue       String?
+  website       String?
+  companyType   String?
+  plan          String?
+  billingPeriod String?
+  state         String?
+  country       String   @default("uk")
+  status        String   @default("pending")
+  isPaid        Boolean  @default(false)
+  infoSubmitted Boolean  @default(false)
+  adminNotes    String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  documents     ApplicationDocument[]
+}
+
+model ApplicationDocument {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  docName       String
+  fileName      String
+  mimeType      String
+  fileSize      Int
+  fileData      Bytes       @db.MediumBlob
+  uploadedAt    DateTime    @default(now())
+}
+
+model ServiceCountry {
+  id        String                @id @default(cuid())
+  name      String
+  isoCode   String                @unique
+  isActive  Boolean               @default(true)
+  createdAt DateTime              @default(now())
+  states    ServiceCountryState[]
+  documents ServiceCountryDoc[]
+  fields    ServiceCountryField[]
+}
+
+model ServiceCountryState {
+  id          String         @id @default(cuid())
+  countryId   String
+  country     ServiceCountry @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  name        String
+  abbr        String?
+  isFeatured  Boolean        @default(false)
+  badge       String?
+  description String?        @db.Text
+  pros        String?        @db.Text
+  isActive    Boolean        @default(true)
+  sortOrder   Int            @default(0)
+}
+
+model ServiceCountryDoc {
+  id          String         @id @default(cuid())
+  countryId   String
+  country     ServiceCountry @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  isRequired  Boolean        @default(true)
+}
+
+model ServiceCountryField {
+  id         String          @id @default(cuid())
+  countryId  String
+  country    ServiceCountry  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  fieldKey   OnboardingField
+  isRequired Boolean         @default(true)
+
+  @@unique([countryId, fieldKey])
+}

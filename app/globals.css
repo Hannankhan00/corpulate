@@ -120,3 +120,18 @@ body {
 .btn-cta:hover {
   opacity: 0.88;
 }
+
+/* ── Utility: custom thin scrollbar ──────────────────── */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 82, 232, 0.55);
+}
