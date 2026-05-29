@@ -14,6 +14,8 @@ const STEPS = [
   { id: 3, label: "Plan Selection" },
   { id: 4, label: "State Selection" },
   { id: 5, label: "Company Information" },
+  { id: 6, label: "Add-ons" },
+  { id: 7, label: "Payment" },
 ];
 
 function Stepper({ current }: { current: number }) {

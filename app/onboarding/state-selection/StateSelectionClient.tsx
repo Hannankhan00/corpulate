@@ -32,6 +32,8 @@ const STEPS = [
   { id: 3, label: "Plan Selection" },
   { id: 4, label: "State Selection" },
   { id: 5, label: "Company Information" },
+  { id: 6, label: "Add-ons" },
+  { id: 7, label: "Payment" },
 ];
 
 function Stepper({ current }: { current: number }) {
@@ -239,7 +241,7 @@ export default function StateSelectionClient({
               </Link>
               <button
                 type="button"
-                onClick={() => router.push(`/onboarding/company-info?country=${country}&type=${type}&plan=${plan}&billing=${billing}&state=${selected}`)}
+                onClick={() => router.push(`/onboarding/company-info?country=${country}&type=${type}&plan=${plan}&billing=${billing}&state=${selected}&stateFee=${selectedFee ?? 0}`)}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-[10px] text-sm font-semibold text-white cursor-pointer border border-[#9f4dbc]"
                 style={{ background: "linear-gradient(90deg, #9452E8 12.5%, #C64CD3 29.3%, #E945A8 45.7%, #FF4AB3 61%, #FF5480 76%, #FF5B62 91.3%)" }}
               >

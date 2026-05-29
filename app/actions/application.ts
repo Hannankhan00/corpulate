@@ -102,8 +102,10 @@ export async function submitApplication(_state: unknown, formData: FormData) {
   await prisma.application.create({
     data: {
       userId: session.userId,
-      companyName: (formData.get("companyName") as string) || null,
-      description: (formData.get("description") as string) || null,
+      companyName:  (formData.get("companyName") as string) || null,
+      companyName2: (formData.get("companyName2") as string) || null,
+      companyName3: (formData.get("companyName3") as string) || null,
+      description:  (formData.get("description") as string) || null,
       industry: (formData.get("industry") as string) || null,
       revenue: (formData.get("revenue") as string) || null,
       website: (formData.get("website") as string) || null,

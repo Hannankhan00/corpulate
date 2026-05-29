@@ -69,6 +69,8 @@ model Application {
   userId        String
   user          User     @relation(fields: [userId], references: [id])
   companyName   String?
+  companyName2  String?
+  companyName3  String?
   description   String?  @db.Text
   industry      String?
   revenue       String?
@@ -78,10 +80,13 @@ model Application {
   billingPeriod String?
   state         String?
   country       String   @default("uk")
-  status        String   @default("pending")
-  isPaid        Boolean  @default(false)
-  infoSubmitted Boolean  @default(false)
-  adminNotes    String?  @db.Text
+  status          String   @default("pending")
+  isPaid          Boolean  @default(false)
+  infoSubmitted   Boolean  @default(false)
+  addons          String?  @db.Text
+  stripePaymentId String?
+  amountPaid      Int?
+  adminNotes      String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   documents     ApplicationDocument[]

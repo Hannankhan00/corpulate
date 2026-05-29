@@ -81,7 +81,9 @@ export default async function CustomerDetailPage({
             style={{ background: "rgba(26,26,28,0.8)", border: "1px solid rgba(255,255,255,0.07)" }}
           >
             <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wide">Company Details</h2>
-            <DetailRow label="Company Name" value={app.companyName} />
+            <DetailRow label="Company Name (1st Choice)" value={app.companyName} />
+            {app.companyName2 && <DetailRow label="Company Name (2nd Choice)" value={app.companyName2} />}
+            {app.companyName3 && <DetailRow label="Company Name (3rd Choice)" value={app.companyName3} />}
             <DetailRow label="Company Type" value={app.companyType?.toUpperCase()} />
             <DetailRow label="Industry" value={app.industry} />
             <DetailRow label="Expected Revenue" value={app.revenue} />
