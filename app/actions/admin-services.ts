@@ -10,7 +10,7 @@ export async function getServiceCountries() {
   return prisma.serviceCountry.findMany({
     orderBy: { name: "asc" },
     include: {
-      _count: { select: { states: true, documents: true, fields: true } },
+      _count: { select: { states: true, documents: true, fields: true, companyTypes: true } },
     },
   });
 }
@@ -20,9 +20,10 @@ export async function getServiceCountry(id: string) {
   return prisma.serviceCountry.findUnique({
     where: { id },
     include: {
-      states: { orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }, { name: "asc" }] },
-      documents: { orderBy: { name: "asc" } },
-      fields: { orderBy: { fieldKey: "asc" } },
+      states:       { orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }, { name: "asc" }] },
+      documents:    { orderBy: { name: "asc" } },
+      fields:       { orderBy: { fieldKey: "asc" } },
+      companyTypes: { orderBy: [{ sortOrder: "asc" }, { name: "asc" }] },
     },
   });
 }
@@ -155,7 +156,74 @@ export async function deleteServiceCountryDoc(id: string, countryId: string) {
   revalidatePath(`/admin/services/${countryId}`);
 }
 
+// ── Company Types (public) ────────────────────────────────────
+
+export async function getCompanyTypesByIso(isoCode: string) {
+  return prisma.serviceCompanyType.findMany({
+    where: { country: { isoCode: isoCode.toUpperCase() }, isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+  });
+}
+
 // ── Fields ────────────────────────────────────────────────────
+
+// ── Company Types (admin) ─────────────────────────────────────
+
+export async function addServiceCompanyType(_prev: unknown, formData: FormData) {
+  await requireAdminSession("ADMIN");
+  const countryId   = formData.get("countryId") as string;
+  const slug        = (formData.get("slug") as string).trim().toLowerCase().replace(/\s+/g, "-");
+  const name        = (formData.get("name") as string).trim();
+  const fullName    = (formData.get("fullName") as string).trim();
+  const description = (formData.get("description") as string | null)?.trim() || null;
+  const isPopular   = formData.get("isPopular") === "true";
+  const sortOrder   = parseInt(formData.get("sortOrder") as string) || 0;
+
+  if (!slug || !name || !fullName) return { error: "Slug, name, and full name are required." };
+  try {
+    await prisma.serviceCompanyType.create({
+      data: { countryId, slug, name, fullName, description, isPopular, sortOrder },
+    });
+    revalidatePath(`/admin/services/${countryId}`);
+    revalidatePath("/onboarding/company-type");
+    return { ok: true };
+  } catch {
+    return { error: "A company type with that slug already exists for this country." };
+  }
+}
+
+export async function updateServiceCompanyType(_prev: unknown, formData: FormData) {
+  await requireAdminSession("ADMIN");
+  const id          = formData.get("id") as string;
+  const countryId   = formData.get("countryId") as string;
+  const name        = (formData.get("name") as string).trim();
+  const fullName    = (formData.get("fullName") as string).trim();
+  const description = (formData.get("description") as string | null)?.trim() || null;
+  const isPopular   = formData.get("isPopular") === "true";
+  const sortOrder   = parseInt(formData.get("sortOrder") as string) || 0;
+
+  await prisma.serviceCompanyType.update({
+    where: { id },
+    data: { name, fullName, description, isPopular, sortOrder },
+  });
+  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath("/onboarding/company-type");
+  return { ok: true };
+}
+
+export async function toggleServiceCompanyType(id: string, countryId: string, isActive: boolean) {
+  await requireAdminSession("ADMIN");
+  await prisma.serviceCompanyType.update({ where: { id }, data: { isActive } });
+  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath("/onboarding/company-type");
+}
+
+export async function deleteServiceCompanyType(id: string, countryId: string) {
+  await requireAdminSession("ADMIN");
+  await prisma.serviceCompanyType.delete({ where: { id } });
+  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath("/onboarding/company-type");
+}
 
 export async function setServiceCountryField(
   countryId: string,

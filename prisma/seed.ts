@@ -449,11 +449,72 @@ async function setFields(
   }
 }
 
+// ── Company Types ─────────────────────────────────────────────
+
+async function upsertCompanyType(
+  countryId: string,
+  data: { slug: string; name: string; fullName: string; description?: string; isPopular?: boolean; sortOrder?: number },
+) {
+  await prisma.serviceCompanyType.upsert({
+    where: { countryId_slug: { countryId, slug: data.slug } },
+    update: {},
+    create: {
+      countryId,
+      slug: data.slug,
+      name: data.name,
+      fullName: data.fullName,
+      description: data.description ?? null,
+      isPopular: data.isPopular ?? false,
+      sortOrder: data.sortOrder ?? 0,
+    },
+  });
+}
+
+async function seedCompanyTypes() {
+  const uk = await prisma.serviceCountry.findUnique({ where: { isoCode: "GB" } });
+  if (uk) {
+    await upsertCompanyType(uk.id, { slug: "ltd",         name: "Ltd",         fullName: "Private Limited Company",          description: "The standard UK business structure. Shareholders' liability is limited to the value of their shares.", isPopular: true,  sortOrder: 1 });
+    await upsertCompanyType(uk.id, { slug: "llp",         name: "LLP",         fullName: "Limited Liability Partnership",     description: "Ideal for professional firms. Partners have limited liability while maintaining a partnership structure.",  isPopular: false, sortOrder: 2 });
+    await upsertCompanyType(uk.id, { slug: "plc",         name: "PLC",         fullName: "Public Limited Company",            description: "Can offer shares to the public on the stock exchange. Requires at least £50,000 in share capital.",       isPopular: false, sortOrder: 3 });
+    await upsertCompanyType(uk.id, { slug: "sole-trader", name: "Sole Trader", fullName: "Sole Proprietorship",               description: "The simplest structure. You run the business as an individual and keep all profits, but bear full liability.", isPopular: false, sortOrder: 4 });
+    console.log("✓ UK company types seeded");
+  }
+
+  const us = await prisma.serviceCountry.findUnique({ where: { isoCode: "US" } });
+  if (us) {
+    await upsertCompanyType(us.id, { slug: "llc",       name: "LLC",         fullName: "Limited Liability Company",        description: "The most popular choice for small businesses. Combines personal liability protection with pass-through taxation.", isPopular: true,  sortOrder: 1 });
+    await upsertCompanyType(us.id, { slug: "ccorp",     name: "C-Corp",      fullName: "C Corporation",                    description: "Best for raising venture capital. Allows unlimited shareholders and multiple stock classes.",                   isPopular: false, sortOrder: 2 });
+    await upsertCompanyType(us.id, { slug: "scorp",     name: "S-Corp",      fullName: "S Corporation",                    description: "Pass-through taxation with corporate liability protection. Limited to 100 US-resident shareholders.",          isPopular: false, sortOrder: 3 });
+    await upsertCompanyType(us.id, { slug: "llp",       name: "LLP",         fullName: "Limited Liability Partnership",    description: "Ideal for professional services firms. Partners have limited liability while maintaining a partnership structure.", isPopular: false, sortOrder: 4 });
+    await upsertCompanyType(us.id, { slug: "sole-prop", name: "Sole Prop",   fullName: "Sole Proprietorship",              description: "The simplest structure. You run your business as an individual — no separation between you and the company.",    isPopular: false, sortOrder: 5 });
+    await upsertCompanyType(us.id, { slug: "dao-llc",   name: "DAO LLC",     fullName: "Decentralized Autonomous Org",     description: "A modern structure for Web3 and blockchain projects. Available in Wyoming and Tennessee.",                       isPopular: false, sortOrder: 6 });
+    console.log("✓ US company types seeded");
+  }
+
+  const ae = await prisma.serviceCountry.findUnique({ where: { isoCode: "AE" } });
+  if (ae) {
+    await upsertCompanyType(ae.id, { slug: "fze",    name: "FZE",    fullName: "Free Zone Establishment",   description: "Single-shareholder free zone entity. 100% foreign ownership with full liability protection.",                       isPopular: true,  sortOrder: 1 });
+    await upsertCompanyType(ae.id, { slug: "fzco",   name: "FZCO",   fullName: "Free Zone Company",         description: "Multi-shareholder free zone entity. Ideal for joint ventures and partnerships with 100% foreign ownership.",      isPopular: false, sortOrder: 2 });
+    await upsertCompanyType(ae.id, { slug: "llc-ae", name: "LLC",    fullName: "Limited Liability Company", description: "Mainland LLC allowing trade across the UAE and with government entities. Requires a local sponsor or Emirati partner.", isPopular: false, sortOrder: 3 });
+    await upsertCompanyType(ae.id, { slug: "branch", name: "Branch", fullName: "Branch Office",             description: "An extension of a foreign company. Can conduct business in the UAE under the parent company's name and activities.", isPopular: false, sortOrder: 4 });
+    console.log("✓ UAE company types seeded");
+  }
+
+  const ca = await prisma.serviceCountry.findUnique({ where: { isoCode: "CA" } });
+  if (ca) {
+    await upsertCompanyType(ca.id, { slug: "corporation", name: "Corporation", fullName: "Canadian Corporation",          description: "The standard Canadian business structure. Provides limited liability and perpetual existence.",                isPopular: true,  sortOrder: 1 });
+    await upsertCompanyType(ca.id, { slug: "lp",          name: "LP",          fullName: "Limited Partnership",          description: "At least one general partner with unlimited liability and limited partners whose liability is capped at their investment.", isPopular: false, sortOrder: 2 });
+    await upsertCompanyType(ca.id, { slug: "llp",         name: "LLP",         fullName: "Limited Liability Partnership", description: "All partners have limited liability. Available to certain professions (lawyers, accountants) in most provinces.", isPopular: false, sortOrder: 3 });
+    console.log("✓ Canada company types seeded");
+  }
+}
+
 // ── Entry point ───────────────────────────────────────────────
 
 async function main() {
   await seedAdmin();
   await seedServiceCountries();
+  await seedCompanyTypes();
   console.log("\nAll done.");
 }
 

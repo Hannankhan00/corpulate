@@ -10,6 +10,10 @@ import {
   addServiceCountryDoc,
   deleteServiceCountryDoc,
   setServiceCountryField,
+  addServiceCompanyType,
+  updateServiceCompanyType,
+  toggleServiceCompanyType,
+  deleteServiceCompanyType,
 } from "@/app/actions/admin-services";
 import type { OnboardingField } from "@/app/generated/prisma/client";
 
@@ -39,6 +43,17 @@ type FieldConfig = {
   isRequired: boolean;
 };
 
+type CompanyType = {
+  id: string;
+  slug: string;
+  name: string;
+  fullName: string;
+  description: string | null;
+  isPopular: boolean;
+  isActive: boolean;
+  sortOrder: number;
+};
+
 type Country = {
   id: string;
   name: string;
@@ -47,6 +62,7 @@ type Country = {
   states: State[];
   documents: Doc[];
   fields: FieldConfig[];
+  companyTypes: CompanyType[];
 };
 
 // ── Field metadata ────────────────────────────────────────────
@@ -64,7 +80,7 @@ const ALL_FIELDS: { key: OnboardingField; label: string; desc: string }[] = [
 
 // ── Tab navigation ────────────────────────────────────────────
 
-type Tab = "states" | "documents" | "fields";
+type Tab = "states" | "documents" | "fields" | "companyTypes";
 
 // ── States tab ────────────────────────────────────────────────
 
@@ -456,15 +472,198 @@ function FieldsTab({ country }: { country: Country }) {
   );
 }
 
+// ── Company Types tab ─────────────────────────────────────────
+
+const inputCls = "w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40";
+
+function AddCompanyTypeForm({ countryId, onDone }: { countryId: string; onDone: () => void }) {
+  const [state, action, pending] = useActionState(addServiceCompanyType, null);
+
+  if (state && "ok" in state) onDone();
+
+  return (
+    <form action={action} className="space-y-3 mt-4">
+      <input type="hidden" name="countryId" value={countryId} />
+      {state && "error" in state && <p className="text-red-400 text-xs">{state.error}</p>}
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Slug</label>
+          <input name="slug" placeholder="e.g. llc" required className={inputCls} />
+          <p className="text-[10px] text-white/25 mt-1">Lowercase, no spaces</p>
+        </div>
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Short Name</label>
+          <input name="name" placeholder="e.g. LLC" required className={inputCls} />
+        </div>
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Sort Order</label>
+          <input name="sortOrder" type="number" defaultValue={0} className={inputCls} />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Full Name</label>
+        <input name="fullName" placeholder="e.g. Limited Liability Company" required className={inputCls} />
+      </div>
+      <div>
+        <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Description</label>
+        <textarea name="description" rows={2} placeholder="Brief description shown to users…" className="w-full rounded-lg bg-[#111] border border-white/15 px-3 py-2 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40 resize-none" />
+      </div>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="isPopular" value="true" className="accent-violet-500 w-4 h-4" />
+        <span className="text-sm text-white/60">Mark as Popular</span>
+      </label>
+      <div className="flex gap-2 justify-end pt-1">
+        <button type="button" onClick={onDone} className="px-3 py-1.5 rounded-lg text-sm text-white/50 hover:text-white cursor-pointer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}>Cancel</button>
+        <button type="submit" disabled={pending} className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white cursor-pointer disabled:opacity-50" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}>
+          {pending ? "Saving…" : "Add Type"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function EditCompanyTypeForm({ ct, countryId, onDone }: { ct: CompanyType; countryId: string; onDone: () => void }) {
+  const [result, action, pending] = useActionState(updateServiceCompanyType, null);
+
+  if (result && "ok" in result) onDone();
+
+  return (
+    <form action={action} className="space-y-3 mt-3">
+      <input type="hidden" name="id" value={ct.id} />
+      <input type="hidden" name="countryId" value={countryId} />
+      {result && "error" in result && <p className="text-red-400 text-xs">{String(result.error)}</p>}
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Short Name</label>
+          <input name="name" defaultValue={ct.name} required className={inputCls} />
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Full Name</label>
+          <input name="fullName" defaultValue={ct.fullName} required className={inputCls} />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="col-span-2">
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Description</label>
+          <textarea name="description" rows={2} defaultValue={ct.description ?? ""} className="w-full rounded-lg bg-[#111] border border-white/15 px-3 py-2 text-white text-sm focus:outline-none focus:border-white/40 resize-none" />
+        </div>
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Sort Order</label>
+          <input name="sortOrder" type="number" defaultValue={ct.sortOrder} className={inputCls} />
+        </div>
+      </div>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="isPopular" value="true" defaultChecked={ct.isPopular} className="accent-violet-500 w-4 h-4" />
+        <span className="text-sm text-white/60">Mark as Popular</span>
+      </label>
+      <div className="flex gap-2 justify-end pt-1">
+        <button type="button" onClick={onDone} className="px-3 py-1.5 rounded-lg text-sm text-white/50 hover:text-white cursor-pointer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}>Cancel</button>
+        <button type="submit" disabled={pending} className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white cursor-pointer disabled:opacity-50" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}>
+          {pending ? "Saving…" : "Save"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function CompanyTypeRow({ ct, countryId }: { ct: CompanyType; countryId: string }) {
+  const [editing, setEditing] = useState(false);
+  const [delPending, startDel] = useTransition();
+  const [togPending, startTog] = useTransition();
+
+  return (
+    <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+      {editing ? (
+        <EditCompanyTypeForm ct={ct} countryId={countryId} onDone={() => setEditing(false)} />
+      ) : (
+        <div className="flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-black text-white/25">{ct.slug}</span>
+              <span className="font-semibold text-white text-sm">{ct.name}</span>
+              <span className="text-xs text-white/40">{ct.fullName}</span>
+              {ct.isPopular && (
+                <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)", color: "white" }}>Popular</span>
+              )}
+              {!ct.isActive && (
+                <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>Hidden</span>
+              )}
+            </div>
+            {ct.description && <p className="text-xs text-white/40 mt-1 leading-relaxed">{ct.description}</p>}
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button type="button" onClick={() => setEditing(true)} className="px-2.5 py-1.5 rounded-lg text-xs text-white/50 hover:text-white cursor-pointer" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)" }}>Edit</button>
+            <button
+              type="button"
+              disabled={togPending}
+              onClick={() => startTog(async () => { await toggleServiceCompanyType(ct.id, countryId, !ct.isActive); })}
+              className="px-2.5 py-1.5 rounded-lg text-xs cursor-pointer disabled:opacity-50"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)", color: ct.isActive ? "#F87171" : "#34D399" }}
+            >
+              {togPending ? "…" : ct.isActive ? "Hide" : "Show"}
+            </button>
+            <button
+              type="button"
+              disabled={delPending}
+              onClick={() => {
+                if (!confirm(`Delete "${ct.name}"?`)) return;
+                startDel(async () => { await deleteServiceCompanyType(ct.id, countryId); });
+              }}
+              className="px-2.5 py-1.5 rounded-lg text-xs text-red-400 hover:bg-red-500/10 cursor-pointer disabled:opacity-50"
+              style={{ border: "1px solid rgba(239,68,68,0.2)" }}
+            >
+              {delPending ? "…" : "Delete"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CompanyTypesTab({ country }: { country: Country }) {
+  const [adding, setAdding] = useState(false);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-white/50">Company structures offered to clients registering in {country.name}.</p>
+        {!adding && (
+          <button type="button" onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white cursor-pointer" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" width={11} height={11}><path d="M12 5v14M5 12h14" /></svg>
+            Add Type
+          </button>
+        )}
+      </div>
+
+      {adding && (
+        <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)" }}>
+          <p className="text-sm font-semibold text-white">New Company Type</p>
+          <AddCompanyTypeForm countryId={country.id} onDone={() => setAdding(false)} />
+        </div>
+      )}
+
+      {country.companyTypes.length === 0 && !adding && (
+        <p className="text-center text-white/25 text-sm py-10">No company types configured yet.</p>
+      )}
+
+      {country.companyTypes.map((ct) => (
+        <CompanyTypeRow key={ct.id} ct={ct} countryId={country.id} />
+      ))}
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────
 
 export default function CountryConfigClient({ country }: { country: Country }) {
   const [tab, setTab] = useState<Tab>("states");
 
   const tabs: { id: Tab; label: string; count: number }[] = [
-    { id: "states",    label: "States / Regions", count: country.states.length },
-    { id: "documents", label: "Required Documents", count: country.documents.length },
-    { id: "fields",    label: "Form Fields", count: country.fields.length },
+    { id: "states",       label: "States / Regions",  count: country.states.length },
+    { id: "documents",    label: "Required Documents", count: country.documents.length },
+    { id: "fields",       label: "Form Fields",        count: country.fields.length },
+    { id: "companyTypes", label: "Company Types",      count: country.companyTypes.length },
   ];
 
   return (
@@ -486,7 +685,7 @@ export default function CountryConfigClient({ country }: { country: Country }) {
               <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>Inactive</span>
             )}
           </div>
-          <p className="text-sm text-white/40 mt-0.5">Configure states, documents, and form fields for this country.</p>
+          <p className="text-sm text-white/40 mt-0.5">Configure states, documents, form fields, and company types for this country.</p>
         </div>
       </div>
 
@@ -517,9 +716,10 @@ export default function CountryConfigClient({ country }: { country: Country }) {
 
       {/* Tab content */}
       <div>
-        {tab === "states"    && <StatesTab    country={country} />}
-        {tab === "documents" && <DocumentsTab country={country} />}
-        {tab === "fields"    && <FieldsTab    country={country} />}
+        {tab === "states"       && <StatesTab       country={country} />}
+        {tab === "documents"    && <DocumentsTab    country={country} />}
+        {tab === "fields"       && <FieldsTab       country={country} />}
+        {tab === "companyTypes" && <CompanyTypesTab country={country} />}
       </div>
     </div>
   );

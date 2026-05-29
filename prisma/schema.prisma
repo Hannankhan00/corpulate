@@ -100,14 +100,15 @@ model ApplicationDocument {
 }
 
 model ServiceCountry {
-  id        String                @id @default(cuid())
-  name      String
-  isoCode   String                @unique
-  isActive  Boolean               @default(true)
-  createdAt DateTime              @default(now())
-  states    ServiceCountryState[]
-  documents ServiceCountryDoc[]
-  fields    ServiceCountryField[]
+  id           String                @id @default(cuid())
+  name         String
+  isoCode      String                @unique
+  isActive     Boolean               @default(true)
+  createdAt    DateTime              @default(now())
+  states       ServiceCountryState[]
+  documents    ServiceCountryDoc[]
+  fields       ServiceCountryField[]
+  companyTypes ServiceCompanyType[]
 }
 
 model ServiceCountryState {
@@ -141,4 +142,20 @@ model ServiceCountryField {
   isRequired Boolean         @default(true)
 
   @@unique([countryId, fieldKey])
+}
+
+model ServiceCompanyType {
+  id          String         @id @default(cuid())
+  countryId   String
+  country     ServiceCountry @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  slug        String
+  name        String
+  fullName    String
+  description String?        @db.Text
+  isPopular   Boolean        @default(false)
+  isActive    Boolean        @default(true)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+
+  @@unique([countryId, slug])
 }
