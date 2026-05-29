@@ -17,6 +17,11 @@ function createPrismaClient() {
   return new PrismaClient({ adapter });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// Lazy proxy so module evaluation during build-time config collection
+// doesn't call createPrismaClient() before DATABASE_URL is available.
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = (globalForPrisma.prisma ??= createPrismaClient());
+    return Reflect.get(client as unknown as object, prop, receiver);
+  },
+});
