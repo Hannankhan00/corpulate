@@ -89,13 +89,13 @@ export async function addServiceCountryState(_prev: unknown, formData: FormData)
   const badge       = (formData.get("badge") as string | null)?.trim() || null;
   const description = (formData.get("description") as string | null)?.trim() || null;
   const prosRaw     = (formData.get("pros") as string | null)?.trim() || null;
-  const pros        = prosRaw
-    ? JSON.stringify(prosRaw.split("\n").map((l) => l.trim()).filter(Boolean))
-    : null;
+  const pros        = prosRaw ? JSON.stringify(prosRaw.split("\n").map((l) => l.trim()).filter(Boolean)) : null;
+  const feeRaw      = (formData.get("fee") as string | null)?.trim();
+  const fee         = feeRaw ? parseInt(feeRaw) || null : null;
 
   if (!name) return { error: "State name is required." };
   await prisma.serviceCountryState.create({
-    data: { countryId, name, abbr, isFeatured, badge, description, pros },
+    data: { countryId, name, abbr, isFeatured, badge, description, pros, fee },
   });
   revalidatePath(`/admin/services/${countryId}`);
   return { ok: true };
@@ -111,13 +111,13 @@ export async function updateServiceCountryState(_prev: unknown, formData: FormDa
   const badge       = (formData.get("badge") as string | null)?.trim() || null;
   const description = (formData.get("description") as string | null)?.trim() || null;
   const prosRaw     = (formData.get("pros") as string | null)?.trim() || null;
-  const pros        = prosRaw
-    ? JSON.stringify(prosRaw.split("\n").map((l) => l.trim()).filter(Boolean))
-    : null;
+  const pros        = prosRaw ? JSON.stringify(prosRaw.split("\n").map((l) => l.trim()).filter(Boolean)) : null;
+  const feeRaw      = (formData.get("fee") as string | null)?.trim();
+  const fee         = feeRaw ? parseInt(feeRaw) || null : null;
 
   await prisma.serviceCountryState.update({
     where: { id },
-    data: { name, abbr, isFeatured, badge, description, pros },
+    data: { name, abbr, isFeatured, badge, description, pros, fee },
   });
   revalidatePath(`/admin/services/${countryId}`);
   return { ok: true };
@@ -154,6 +154,77 @@ export async function deleteServiceCountryDoc(id: string, countryId: string) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCountryDoc.delete({ where: { id } });
   revalidatePath(`/admin/services/${countryId}`);
+}
+
+// ── Plans (public) ────────────────────────────────────────────
+
+export async function getActivePlans() {
+  return prisma.servicePlan.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+  });
+}
+
+// ── Plans (admin) ─────────────────────────────────────────────
+
+export async function getAllPlans() {
+  await requireAdminSession();
+  return prisma.servicePlan.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
+}
+
+export async function addPlan(_prev: unknown, formData: FormData) {
+  await requireAdminSession("ADMIN");
+  const slug              = (formData.get("slug") as string).trim().toLowerCase().replace(/\s+/g, "-");
+  const name              = (formData.get("name") as string).trim();
+  const monthlyPrice      = parseInt(formData.get("monthlyPrice") as string) || 0;
+  const annualDiscountPct = Math.min(100, Math.max(0, parseInt(formData.get("annualDiscountPct") as string) || 20));
+  const description       = (formData.get("description") as string | null)?.trim() || null;
+  const featuresRaw       = (formData.get("features") as string | null)?.trim() || "";
+  const features          = JSON.stringify(featuresRaw.split("\n").map((l) => l.trim()).filter(Boolean));
+  const isHighlight       = formData.get("isHighlight") === "true";
+  const sortOrder         = parseInt(formData.get("sortOrder") as string) || 0;
+
+  if (!slug || !name) return { error: "Slug and name are required." };
+  try {
+    await prisma.servicePlan.create({ data: { slug, name, monthlyPrice, annualDiscountPct, description, features, isHighlight, sortOrder } });
+    revalidatePath("/admin/plans");
+    revalidatePath("/onboarding/plan-selection");
+    return { ok: true };
+  } catch {
+    return { error: "A plan with that slug already exists." };
+  }
+}
+
+export async function updatePlan(_prev: unknown, formData: FormData) {
+  await requireAdminSession("ADMIN");
+  const id                = formData.get("id") as string;
+  const name              = (formData.get("name") as string).trim();
+  const monthlyPrice      = parseInt(formData.get("monthlyPrice") as string) || 0;
+  const annualDiscountPct = Math.min(100, Math.max(0, parseInt(formData.get("annualDiscountPct") as string) || 20));
+  const description       = (formData.get("description") as string | null)?.trim() || null;
+  const featuresRaw       = (formData.get("features") as string | null)?.trim() || "";
+  const features          = JSON.stringify(featuresRaw.split("\n").map((l) => l.trim()).filter(Boolean));
+  const isHighlight       = formData.get("isHighlight") === "true";
+  const sortOrder         = parseInt(formData.get("sortOrder") as string) || 0;
+
+  await prisma.servicePlan.update({ where: { id }, data: { name, monthlyPrice, annualDiscountPct, description, features, isHighlight, sortOrder } });
+  revalidatePath("/admin/plans");
+  revalidatePath("/onboarding/plan-selection");
+  return { ok: true };
+}
+
+export async function togglePlan(id: string, isActive: boolean) {
+  await requireAdminSession("ADMIN");
+  await prisma.servicePlan.update({ where: { id }, data: { isActive } });
+  revalidatePath("/admin/plans");
+  revalidatePath("/onboarding/plan-selection");
+}
+
+export async function deletePlan(id: string) {
+  await requireAdminSession("ADMIN");
+  await prisma.servicePlan.delete({ where: { id } });
+  revalidatePath("/admin/plans");
+  revalidatePath("/onboarding/plan-selection");
 }
 
 // ── Company Types (public) ────────────────────────────────────

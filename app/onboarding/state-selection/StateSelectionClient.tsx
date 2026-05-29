@@ -13,6 +13,7 @@ export type StateOption = {
   badge: string | null;
   description: string | null;
   pros: string[];
+  fee: number | null;
 };
 
 type Props = {
@@ -21,7 +22,7 @@ type Props = {
   plan: string;
   billing: string;
   featuredStates: StateOption[];
-  allStateNames: string[];
+  allStates: StateOption[];
   defaultSelected: string;
 };
 
@@ -72,15 +73,18 @@ function Stepper({ current }: { current: number }) {
 
 export default function StateSelectionClient({
   country, type, plan, billing,
-  featuredStates, allStateNames, defaultSelected,
+  featuredStates, allStates, defaultSelected,
 }: Props) {
   const router = useRouter();
   const [selected, setSelected] = useState(defaultSelected);
   const [search, setSearch]     = useState("");
 
-  const filtered = allStateNames.filter((s) =>
-    s.toLowerCase().includes(search.toLowerCase())
+  const filtered = allStates.filter((s) =>
+    s.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const selectedState = [...featuredStates, ...allStates].find((s) => s.id === selected);
+  const selectedFee   = selectedState?.fee ?? null;
 
   const PAGE_BG =
     "radial-gradient(ellipse 60% 80% at 0% 50%, rgba(13,100,139,0.45) 0%, rgba(6,6,6,0) 55%), radial-gradient(ellipse 50% 70% at 100% 30%, rgba(65,18,38,0.55) 0%, rgba(6,6,6,0) 55%), #070707";
@@ -137,6 +141,9 @@ export default function StateSelectionClient({
                       <div className="flex items-center gap-2 mb-2">
                         {state.abbr && <span className="text-2xl font-black text-white/20">{state.abbr}</span>}
                         <span className="font-bold text-white text-sm">{state.name}</span>
+                        {state.fee != null && state.fee > 0 && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded ml-1" style={{ background: "rgba(251,191,36,0.12)", color: "#FCD34D" }}>+${state.fee}</span>
+                        )}
                       </div>
                       {state.description && <p className="text-xs text-white/40 mb-3 leading-relaxed">{state.description}</p>}
                       {state.pros.length > 0 && (
@@ -156,7 +163,7 @@ export default function StateSelectionClient({
             )}
 
             {/* Search all states */}
-            {allStateNames.length > 0 && (
+            {allStates.length > 0 && (
               <div className="mb-3">
                 <p className="text-xs text-white/40 uppercase tracking-wide mb-2">
                   {featuredStates.length > 0 ? "Or search all states" : "Search states"}
@@ -176,21 +183,23 @@ export default function StateSelectionClient({
                 {search && (
                   <div className="mt-2 flex flex-wrap gap-2 max-h-30 overflow-y-auto">
                     {filtered.map((s) => {
-                      const sid = s.toLowerCase().replace(/\s+/g, "-");
-                      const isSel = selected === sid;
+                      const isSel = selected === s.id;
                       return (
                         <button
-                          key={s}
+                          key={s.id}
                           type="button"
-                          onClick={() => setSelected(sid)}
-                          className="px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-150"
+                          onClick={() => setSelected(s.id)}
+                          className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium cursor-pointer transition-all duration-150"
                           style={{
                             background: isSel ? "rgba(148,82,232,0.3)" : "rgba(255,255,255,0.07)",
                             border: isSel ? "1px solid rgba(148,82,232,0.6)" : "1px solid rgba(255,255,255,0.10)",
                             color: isSel ? "white" : "rgba(255,255,255,0.6)",
                           }}
                         >
-                          {s}
+                          {s.name}
+                          {s.fee != null && s.fee > 0 && (
+                            <span className="text-[10px] font-bold" style={{ color: "#FCD34D" }}>+${s.fee}</span>
+                          )}
                         </button>
                       );
                     })}
@@ -199,7 +208,20 @@ export default function StateSelectionClient({
               </div>
             )}
 
-            {featuredStates.length === 0 && allStateNames.length === 0 && (
+            {/* Fee notice when a state with a fee is selected */}
+            {selectedFee != null && selectedFee > 0 && (
+              <div className="mb-4 flex items-start gap-3 px-4 py-3 rounded-[10px]" style={{ background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.20)" }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FCD34D" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={15} height={15} className="shrink-0 mt-0.5">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <p className="text-xs leading-relaxed" style={{ color: "#FCD34D" }}>
+                  <span className="font-bold">Additional state processing fee: +${selectedFee}</span>
+                  {" "}— this state requires an additional fee on top of your plan price.
+                </p>
+              </div>
+            )}
+
+            {featuredStates.length === 0 && allStates.length === 0 && (
               <div className="flex-1 flex items-center justify-center">
                 <p className="text-white/30 text-sm text-center">No states have been configured for this country yet.</p>
               </div>

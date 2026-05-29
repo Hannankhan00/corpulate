@@ -509,12 +509,91 @@ async function seedCompanyTypes() {
   }
 }
 
+// ── Plans ─────────────────────────────────────────────────────
+
+async function seedPlans() {
+  const plans: {
+    slug: string; name: string; monthlyPrice: number; annualDiscountPct: number;
+    description: string; features: string[]; isHighlight: boolean; sortOrder: number;
+  }[] = [
+    {
+      slug: "starter",
+      name: "Starter",
+      monthlyPrice: 49,
+      annualDiscountPct: 20,
+      description: "Perfect for solo founders getting started.",
+      features: [
+        "Company registration",
+        "Registered agent (1 year)",
+        "EIN / Tax ID application",
+        "Operating agreement",
+        "Email support",
+      ],
+      isHighlight: false,
+      sortOrder: 1,
+    },
+    {
+      slug: "professional",
+      name: "Professional",
+      monthlyPrice: 149,
+      annualDiscountPct: 20,
+      description: "Most popular for growing businesses.",
+      features: [
+        "Everything in Starter",
+        "Business bank account setup",
+        "Bookkeeping (up to 50 txns/mo)",
+        "Annual report filing",
+        "Priority support",
+        "Compliance calendar",
+      ],
+      isHighlight: true,
+      sortOrder: 2,
+    },
+    {
+      slug: "enterprise",
+      name: "Enterprise",
+      monthlyPrice: 299,
+      annualDiscountPct: 20,
+      description: "Full-service for serious operators.",
+      features: [
+        "Everything in Professional",
+        "Dedicated account manager",
+        "Trademark registration",
+        "Multi-state compliance",
+        "Unlimited bookkeeping",
+        "Phone + video support",
+      ],
+      isHighlight: false,
+      sortOrder: 3,
+    },
+  ];
+
+  for (const p of plans) {
+    await prisma.servicePlan.upsert({
+      where: { slug: p.slug },
+      update: {},
+      create: {
+        slug: p.slug,
+        name: p.name,
+        monthlyPrice: p.monthlyPrice,
+        annualDiscountPct: p.annualDiscountPct,
+        description: p.description,
+        features: JSON.stringify(p.features),
+        isHighlight: p.isHighlight,
+        sortOrder: p.sortOrder,
+      },
+    });
+  }
+  console.log("✓ Plans seeded");
+}
+
 // ── Entry point ───────────────────────────────────────────────
 
 async function main() {
   await seedAdmin();
   await seedServiceCountries();
   await seedCompanyTypes();
+  await seedPlans();
   console.log("\nAll done.");
 }
 

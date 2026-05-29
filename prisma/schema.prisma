@@ -121,6 +121,7 @@ model ServiceCountryState {
   badge       String?
   description String?        @db.Text
   pros        String?        @db.Text
+  fee         Int?
   isActive    Boolean        @default(true)
   sortOrder   Int            @default(0)
 }
@@ -142,6 +143,21 @@ model ServiceCountryField {
   isRequired Boolean         @default(true)
 
   @@unique([countryId, fieldKey])
+}
+
+model ServicePlan {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name              String
+  monthlyPrice      Int
+  annualDiscountPct Int      @default(20)
+  description       String?
+  features          String   @db.Text
+  isHighlight       Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model ServiceCompanyType {

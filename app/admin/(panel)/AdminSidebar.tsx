@@ -70,6 +70,14 @@ const ServicesIcon = () => (
   </svg>
 );
 
+const PlansIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+    <rect x="2" y="3" width="20" height="14" rx="2" />
+    <path d="M8 21h8M12 17v4" />
+    <path d="M7 8h.01M11 8h6M7 12h.01M11 12h6" />
+  </svg>
+);
+
 const NAV_BASE = [
   { id: "overview",   label: "Overview",    href: "/admin",            icon: <OverviewIcon /> },
   { id: "customers",  label: "Customers",   href: "/admin/customers",  icon: <CustomersIcon /> },
@@ -82,6 +90,10 @@ const NAV_TEAM = {
 
 const NAV_SERVICES = {
   id: "services", label: "Services", href: "/admin/services", icon: <ServicesIcon />,
+};
+
+const NAV_PLANS = {
+  id: "plans", label: "Plans", href: "/admin/plans", icon: <PlansIcon />,
 };
 
 export default function AdminSidebar({
@@ -97,7 +109,7 @@ export default function AdminSidebar({
   const navItems =
     role === "SUPPORT"
       ? NAV_BASE
-      : [...NAV_BASE, NAV_SERVICES, NAV_TEAM];
+      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_TEAM];
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";

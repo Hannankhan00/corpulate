@@ -27,6 +27,7 @@ type State = {
   badge: string | null;
   description: string | null;
   pros: string | null;
+  fee: number | null;
   isActive: boolean;
 };
 
@@ -105,12 +106,16 @@ function AddStateForm({ countryId, onDone }: { countryId: string; onDone: () => 
           <input name="abbr" placeholder="WY" maxLength={4} className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40" />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Badge (optional)</label>
           <input name="badge" placeholder="Most Popular" className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40" />
         </div>
-        <div className="flex items-end gap-3 pb-0.5">
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Extra Fee ($)</label>
+          <input name="fee" type="number" min={0} placeholder="Leave blank for free" className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40" />
+        </div>
+        <div className="flex items-end pb-1.5">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" name="isFeatured" value="true" className="accent-violet-500 w-4 h-4" />
             <span className="text-sm text-white/60">Featured</span>
@@ -158,10 +163,14 @@ function EditStateForm({ state: s, countryId, onDone }: { state: State; countryI
           <input name="abbr" defaultValue={s.abbr ?? ""} maxLength={4} className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm focus:outline-none focus:border-white/40" />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Badge</label>
           <input name="badge" defaultValue={s.badge ?? ""} className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm focus:outline-none focus:border-white/40" />
+        </div>
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Extra Fee ($)</label>
+          <input name="fee" type="number" min={0} defaultValue={s.fee ?? ""} placeholder="None" className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40" />
         </div>
         <div className="flex items-end pb-1">
           <label className="flex items-center gap-2 cursor-pointer">
@@ -206,6 +215,9 @@ function StateRow({ s, countryId }: { s: State; countryId: string }) {
               <span className="font-semibold text-white text-sm">{s.name}</span>
               {s.isFeatured && s.badge && (
                 <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)", color: "white" }}>{s.badge}</span>
+              )}
+              {s.fee != null && s.fee > 0 && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(251,191,36,0.12)", color: "#FCD34D" }}>+${s.fee} fee</span>
               )}
               {!s.isActive && (
                 <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>Inactive</span>
