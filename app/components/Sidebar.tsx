@@ -70,6 +70,18 @@ const SettingsIcon = () => (
   </svg>
 );
 
+const MenuIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={20} height={20}>
+    <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+    <path d="M18 6L6 18M6 6l12 12" />
+  </svg>
+);
+
 export const ChevronDown = ({ rotated }: { rotated?: boolean }) => (
   <svg
     viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
@@ -135,6 +147,7 @@ export default function Sidebar({
     new Set(["my-company", "bookkeeping", "banking"])
   );
   const [displayName, setDisplayName] = useState<string>("…");
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     getMe().then((user) => {
@@ -150,80 +163,122 @@ export default function Sidebar({
     });
 
   return (
-    <aside
-      className="w-52 shrink-0 flex flex-col border-r border-white/6 overflow-y-auto"
-      style={{ background: "rgba(26,26,28,0.72)", backdropFilter: "blur(12px)" }}
-    >
-      {/* Logo */}
-      <div className="px-4 pt-5 pb-4 shrink-0">
-        <Image src="/assets/logo.png" alt="Corpulate" width={130} height={40} priority style={{ height: "auto" }} />
-      </div>
+    <>
+      {/* Mobile hamburger trigger */}
+      <button
+        type="button"
+        onClick={() => setMobileOpen(true)}
+        className="fixed top-4 left-4 z-60 md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10"
+        style={{ background: "rgba(26,26,28,0.9)", border: "1px solid rgba(255,255,255,0.15)" }}
+        aria-label="Open navigation"
+      >
+        <MenuIcon />
+      </button>
 
-      {/* User dropdown button */}
-      <div className="px-3 mb-3 shrink-0">
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-55 md:hidden"
+          style={{ background: "rgba(0,0,0,0.6)" }}
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={[
+          "flex flex-col border-r border-white/6 overflow-y-auto",
+          // Mobile: fixed slide-in drawer
+          "fixed inset-y-0 left-0 z-60 w-52 transition-transform duration-300 ease-in-out",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop: normal flex item
+          "md:relative md:translate-x-0 md:z-auto md:shrink-0",
+        ].join(" ")}
+        style={{ background: "rgba(26,26,28,0.95)", backdropFilter: "blur(12px)" }}
+      >
+        {/* Mobile close button */}
         <button
           type="button"
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-elevated text-sm text-fg cursor-pointer hover:bg-overlay transition-colors duration-150"
-          aria-label="Switch account or country"
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors z-10"
+          aria-label="Close navigation"
         >
-          <ReactCountryFlag
-            countryCode={countryCode}
-            svg
-            style={{ width: "1.35em", height: "1.35em", borderRadius: "3px", flexShrink: 0 }}
-          />
-          <span className="font-medium flex-1 text-left">{displayName}</span>
-          <ChevronDown />
+          <XIcon />
         </button>
-      </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-2 pb-6">
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeItem === item.id;
-          return (
-            <div key={item.id}>
-              {item.children ? (
-                <button
-                  type="button"
-                  onClick={() => toggle(item.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm cursor-pointer transition-colors duration-150 ${
-                    isActive ? "text-fg bg-white/10" : "text-nav-idle-text hover:text-fg hover:bg-white/5"
-                  }`}
-                >
-                  <span className="shrink-0">{item.icon}</span>
-                  <span className="flex-1 text-left leading-tight">{item.label}</span>
-                  <ChevronDown rotated={expanded.has(item.id)} />
-                </button>
-              ) : (
-                <Link
-                  href={item.href ?? "#"}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 ${
-                    isActive ? "text-fg bg-white/10" : "text-nav-idle-text hover:text-fg hover:bg-white/5"
-                  }`}
-                >
-                  <span className="shrink-0">{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
-              )}
+        {/* Logo */}
+        <div className="px-4 pt-5 pb-4 shrink-0">
+          <Image src="/assets/logo.png" alt="Corpulate" width={130} height={40} priority style={{ height: "auto" }} />
+        </div>
 
-              {item.children && expanded.has(item.id) && (
-                <div className="ml-4 mb-1">
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.id}
-                      href={child.href ?? "#"}
-                      className="flex items-center gap-1.5 pl-3 pr-3 py-1.5 text-[13px] rounded-md transition-colors duration-150 text-nav-idle-text hover:text-fg hover:bg-white/5"
-                    >
-                      <span className="text-[10px] opacity-50 select-none">└─</span>
-                      <span>{child.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-    </aside>
+        {/* User dropdown button */}
+        <div className="px-3 mb-3 shrink-0">
+          <button
+            type="button"
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-elevated text-sm text-fg cursor-pointer hover:bg-overlay transition-colors duration-150"
+            aria-label="Switch account or country"
+          >
+            <ReactCountryFlag
+              countryCode={countryCode}
+              svg
+              style={{ width: "1.35em", height: "1.35em", borderRadius: "3px", flexShrink: 0 }}
+            />
+            <span className="font-medium flex-1 text-left">{displayName}</span>
+            <ChevronDown />
+          </button>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-2 pb-6">
+          {NAV_ITEMS.map((item) => {
+            const isActive = activeItem === item.id;
+            return (
+              <div key={item.id}>
+                {item.children ? (
+                  <button
+                    type="button"
+                    onClick={() => toggle(item.id)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm cursor-pointer transition-colors duration-150 ${
+                      isActive ? "text-fg bg-white/10" : "text-nav-idle-text hover:text-fg hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="shrink-0">{item.icon}</span>
+                    <span className="flex-1 text-left leading-tight">{item.label}</span>
+                    <ChevronDown rotated={expanded.has(item.id)} />
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href ?? "#"}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 ${
+                      isActive ? "text-fg bg-white/10" : "text-nav-idle-text hover:text-fg hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="shrink-0">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                )}
+
+                {item.children && expanded.has(item.id) && (
+                  <div className="ml-4 mb-1">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.id}
+                        href={child.href ?? "#"}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-1.5 pl-3 pr-3 py-1.5 text-[13px] rounded-md transition-colors duration-150 text-nav-idle-text hover:text-fg hover:bg-white/5"
+                      >
+                        <span className="text-[10px] opacity-50 select-none">└─</span>
+                        <span>{child.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 }

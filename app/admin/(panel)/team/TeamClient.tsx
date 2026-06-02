@@ -69,7 +69,7 @@ function CreateMemberForm({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-white/50 mb-2 uppercase tracking-wide">Full Name</label>
           <input
@@ -255,7 +255,7 @@ export default function TeamClient({
   return (
     <div>
       {/* Header row */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 pl-10 md:pl-0">
         <div>
           <h1 className="text-2xl font-bold text-white">Team</h1>
           <p className="text-sm text-white/40 mt-1">

@@ -51,8 +51,8 @@ export default async function CustomerDetailPage({
   });
 
   return (
-    <div className="p-8">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex items-center gap-3 mb-6 md:mb-8 pl-10 md:pl-0">
         <Link
           href="/admin/customers"
           className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/50 hover:text-white transition-colors cursor-pointer"
@@ -74,8 +74,8 @@ export default async function CustomerDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2 space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-5">
           <div
             className="rounded-xl p-6"
             style={{ background: "rgba(26,26,28,0.8)", border: "1px solid rgba(255,255,255,0.07)" }}
@@ -121,9 +121,9 @@ export default async function CustomerDetailPage({
           </div>
         </div>
 
-        <div className="col-span-1">
+        <div className="lg:col-span-1">
           <div
-            className="rounded-xl p-6 sticky top-8"
+            className="rounded-xl p-6 lg:sticky lg:top-8"
             style={{ background: "rgba(26,26,28,0.8)", border: "1px solid rgba(255,255,255,0.07)" }}
           >
             <h2 className="text-sm font-semibold text-white/70 mb-5 uppercase tracking-wide">Manage Application</h2>

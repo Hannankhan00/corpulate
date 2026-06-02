@@ -63,8 +63,8 @@ export default function CustomerSearch({ applications }: { applications: Applica
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-5">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-wrap items-center gap-3 mb-5">
+        <div className="relative flex-1 min-w-48">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={14} height={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30">
             <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
           </svg>
@@ -77,7 +77,7 @@ export default function CustomerSearch({ applications }: { applications: Applica
             style={{ background: "rgba(26,26,28,0.8)", border: "1px solid rgba(255,255,255,0.10)" }}
           />
         </div>
-        <div className="flex items-center gap-1.5 p-1 rounded-lg" style={{ background: "rgba(26,26,28,0.8)", border: "1px solid rgba(255,255,255,0.07)" }}>
+        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg" style={{ background: "rgba(26,26,28,0.8)", border: "1px solid rgba(255,255,255,0.07)" }}>
           {STATUS_OPTIONS.map((opt) => (
             <button
               key={opt.value}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: "Corpulate: Strategy. Success. Growth.",
   description:
     "Company registration, EIN & ITIN filing, and business banking solutions for international entrepreneurs in the US, UK, and UAE.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

@@ -96,7 +96,7 @@ function AddStateForm({ countryId, onDone }: { countryId: string; onDone: () => 
     <form action={action} className="space-y-3 mt-4">
       <input type="hidden" name="countryId" value={countryId} />
       {state && "error" in state && <p className="text-red-400 text-xs">{state.error}</p>}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="col-span-2">
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">State / Region Name</label>
           <input name="name" placeholder="e.g. Wyoming" required className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40" />
@@ -106,7 +106,7 @@ function AddStateForm({ countryId, onDone }: { countryId: string; onDone: () => 
           <input name="abbr" placeholder="WY" maxLength={4} className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40" />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Badge (optional)</label>
           <input name="badge" placeholder="Most Popular" className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40" />
@@ -153,7 +153,7 @@ function EditStateForm({ state: s, countryId, onDone }: { state: State; countryI
       <input type="hidden" name="id" value={s.id} />
       <input type="hidden" name="countryId" value={countryId} />
       {result && "error" in result && <p className="text-red-400 text-xs">{String(result.error)}</p>}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="col-span-2">
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Name</label>
           <input name="name" defaultValue={s.name} required className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm focus:outline-none focus:border-white/40" />
@@ -163,7 +163,7 @@ function EditStateForm({ state: s, countryId, onDone }: { state: State; countryI
           <input name="abbr" defaultValue={s.abbr ?? ""} maxLength={4} className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm focus:outline-none focus:border-white/40" />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Badge</label>
           <input name="badge" defaultValue={s.badge ?? ""} className="w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm focus:outline-none focus:border-white/40" />
@@ -497,7 +497,7 @@ function AddCompanyTypeForm({ countryId, onDone }: { countryId: string; onDone: 
     <form action={action} className="space-y-3 mt-4">
       <input type="hidden" name="countryId" value={countryId} />
       {state && "error" in state && <p className="text-red-400 text-xs">{state.error}</p>}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Slug</label>
           <input name="slug" placeholder="e.g. llc" required className={inputCls} />
@@ -544,7 +544,7 @@ function EditCompanyTypeForm({ ct, countryId, onDone }: { ct: CompanyType; count
       <input type="hidden" name="id" value={ct.id} />
       <input type="hidden" name="countryId" value={countryId} />
       {result && "error" in result && <p className="text-red-400 text-xs">{String(result.error)}</p>}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Short Name</label>
           <input name="name" defaultValue={ct.name} required className={inputCls} />
@@ -554,7 +554,7 @@ function EditCompanyTypeForm({ ct, countryId, onDone }: { ct: CompanyType; count
           <input name="fullName" defaultValue={ct.fullName} required className={inputCls} />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="col-span-2">
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Description</label>
           <textarea name="description" rows={2} defaultValue={ct.description ?? ""} className="w-full rounded-lg bg-[#111] border border-white/15 px-3 py-2 text-white text-sm focus:outline-none focus:border-white/40 resize-none" />
@@ -679,9 +679,9 @@ export default function CountryConfigClient({ country }: { country: Country }) {
   ];
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center gap-4 mb-6 md:mb-8 pl-10 md:pl-0">
         <ReactCountryFlag
           countryCode={country.isoCode}
           svg

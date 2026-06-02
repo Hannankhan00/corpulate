@@ -82,13 +82,13 @@ export default async function WorkQueuePage() {
   const done        = all.filter((a) => a.status === "completed" || a.status === "rejected");
 
   return (
-    <div className="p-8 h-full flex flex-col">
-      <div className="mb-8 shrink-0">
+    <div className="p-4 md:p-8 h-full flex flex-col">
+      <div className="mb-6 md:mb-8 shrink-0 pl-10 md:pl-0">
         <h1 className="text-2xl font-bold text-white">Work Queue</h1>
         <p className="text-sm text-white/40 mt-1">Track application progress across all stages.</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-5 flex-1 min-h-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 flex-1 min-h-0">
         <KanbanLane
           title="Needs Review"
           count={needsReview.length}

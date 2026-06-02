@@ -42,7 +42,7 @@ function PlanForm({
       {plan && <input type="hidden" name="id" value={plan.id} />}
       {error && <p className="text-red-400 text-xs">{error}</p>}
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {isNew && (
           <div>
             <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Slug</label>
@@ -221,8 +221,8 @@ export default function PlansClient({ plans }: { plans: Plan[] }) {
   const [adding, setAdding] = useState(false);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 md:mb-8 pl-10 md:pl-0">
         <div>
           <h1 className="text-2xl font-bold text-white">Plans</h1>
           <p className="text-sm text-white/45 mt-1">Set pricing, features, and visibility for each onboarding plan.</p>

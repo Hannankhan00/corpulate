@@ -27,7 +27,7 @@ function AddCountryForm({ onDone }: { onDone: () => void }) {
       {state && "error" in state && (
         <p className="text-red-400 text-xs">{state.error}</p>
       )}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-xs text-white/50 mb-1.5 uppercase tracking-wide">Country Name</label>
           <input
@@ -112,8 +112,8 @@ export default function ServicesClient({ countries }: { countries: Country[] }) 
   const [adding, setAdding] = useState(false);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 md:mb-8 pl-10 md:pl-0">
         <div>
           <h1 className="text-2xl font-bold text-white">Service Countries</h1>
           <p className="text-sm text-white/45 mt-1">Manage which countries you offer company registration in.</p>

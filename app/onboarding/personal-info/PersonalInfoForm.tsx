@@ -47,7 +47,7 @@ export default function PersonalInfoForm({ country, user }: Props) {
       {/* Scrollable fields */}
       <div className="flex-1 overflow-y-auto scrollbar-thin space-y-5 pr-3 pb-2">
         {/* Name row */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs text-white/50 mb-2 uppercase tracking-wide">First Name</label>
             <input
@@ -131,7 +131,7 @@ export default function PersonalInfoForm({ country, user }: Props) {
                 className={inputClass()}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="city" className="block text-xs text-white/35 mb-1.5">City</label>
                 <input id="city" name="city" type="text" defaultValue={user.city ?? ""} placeholder="e.g. London" className={inputClass()} />
@@ -141,7 +141,7 @@ export default function PersonalInfoForm({ country, user }: Props) {
                 <input id="province" name="province" type="text" defaultValue={user.province ?? ""} placeholder="e.g. Ontario" className={inputClass()} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="postalCode" className="block text-xs text-white/35 mb-1.5">Postal / ZIP Code</label>
                 <input id="postalCode" name="postalCode" type="text" defaultValue={user.postalCode ?? ""} placeholder="e.g. SW1A 1AA" className={inputClass()} />

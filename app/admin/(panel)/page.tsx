@@ -59,13 +59,13 @@ export default async function AdminOverviewPage() {
   const recent = applications.slice(0, 10);
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-4 md:p-8">
+      <div className="mb-6 md:mb-8 pl-10 md:pl-0">
         <h1 className="text-2xl font-bold text-white">Admin Overview</h1>
         <p className="text-sm text-white/40 mt-1">Monitor applications and user activity across the platform.</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         <StatCard
           label="Total Users"
           value={stats.totalUsers}

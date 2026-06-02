@@ -246,9 +246,9 @@ export default function DashboardClient({
     <div className="flex h-screen overflow-hidden" style={{ background: PAGE_BG }}>
       <Sidebar countryCode={activeIso} activeItem="home" />
 
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6">
         {/* Welcome bar */}
-        <div className="flex items-center gap-4 rounded-[50px] px-5 py-4 mb-4" style={{ background: "#1a1a1c", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.3)" }}>
+        <div className="flex items-center gap-3 md:gap-4 rounded-[50px] pl-12 pr-4 md:px-5 py-4 mb-4" style={{ background: "#1a1a1c", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.3)" }}>
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ background: "linear-gradient(135deg,#7C3AED,#06B6D4)" }}>
             {firstName.charAt(0).toUpperCase()}
           </div>
@@ -269,7 +269,7 @@ export default function DashboardClient({
         </div>
 
         {/* Info banner */}
-        <div className="flex items-center gap-4 rounded-[15px] px-5 py-4 mb-6" style={{ background: "rgba(83,83,83,0.49)", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.5)" }}>
+        <div className="flex flex-wrap items-center gap-3 rounded-[15px] px-4 md:px-5 py-4 mb-6" style={{ background: "rgba(83,83,83,0.49)", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.5)" }}>
           <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(109,40,217,0.35)", border: "1px solid rgba(139,92,246,0.4)" }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="#C4B5FD" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" width={14} height={14}>
               <circle cx="12" cy="12" r="10" />
@@ -288,7 +288,7 @@ export default function DashboardClient({
           <button
             type="button"
             onClick={() => openModal("change")}
-            className="flex items-center gap-2 px-4 py-2 border border-white rounded-[10px] text-sm text-white hover:bg-white/10 transition-colors duration-150 cursor-pointer shrink-0"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 border border-white rounded-[10px] text-sm text-white hover:bg-white/10 transition-colors duration-150 cursor-pointer"
             style={{ background: "#1a1a1c" }}
           >
             <ReactCountryFlag countryCode={activeIso} svg style={{ width: "1.4em", height: "1.4em", borderRadius: "3px" }} />
@@ -300,9 +300,9 @@ export default function DashboardClient({
         </div>
 
         {/* Service cards */}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="rounded-[15px] overflow-hidden flex flex-col" style={{ background: "rgba(83,83,83,0.49)", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.5)" }}>
-            <div className="h-52 flex items-end justify-center px-4 pt-4 rounded-[30px] mx-2 mt-2" style={{ background: "linear-gradient(90deg, rgba(214,68,167,0.8) 6.25%, rgba(159,77,188,0.8) 36%, rgba(159,77,188,0.8) 69%, rgba(174,73,196,0.5) 94%)" }}>
+            <div className="h-40 md:h-52 flex items-end justify-center px-4 pt-4 rounded-[30px] mx-2 mt-2" style={{ background: "linear-gradient(90deg, rgba(214,68,167,0.8) 6.25%, rgba(159,77,188,0.8) 36%, rgba(159,77,188,0.8) 69%, rgba(174,73,196,0.5) 94%)" }}>
               <StartCompanyIllustration />
             </div>
             <div className="px-6 py-5 flex flex-col flex-1">
@@ -322,7 +322,7 @@ export default function DashboardClient({
           </div>
 
           <div className="rounded-[15px] overflow-hidden flex flex-col" style={{ background: "rgba(83,83,83,0.49)", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.5)" }}>
-            <div className="h-52 flex items-end justify-center px-4 pt-4 rounded-[30px] mx-2 mt-2" style={{ background: "linear-gradient(90deg, rgba(214,68,167,0.8) 6.25%, rgba(159,77,188,0.8) 36%, rgba(159,77,188,0.8) 69%, rgba(174,73,196,0.5) 94%)" }}>
+            <div className="h-40 md:h-52 flex items-end justify-center px-4 pt-4 rounded-[30px] mx-2 mt-2" style={{ background: "linear-gradient(90deg, rgba(214,68,167,0.8) 6.25%, rgba(159,77,188,0.8) 36%, rgba(159,77,188,0.8) 69%, rgba(174,73,196,0.5) 94%)" }}>
               <BuyServiceIllustration />
             </div>
             <div className="px-6 py-5 flex flex-col flex-1">
@@ -350,7 +350,7 @@ export default function DashboardClient({
                 return (
                   <div
                     key={app.id}
-                    className="flex items-center gap-4 rounded-[12px] px-5 py-4"
+                    className="flex flex-wrap items-center gap-3 rounded-xl px-4 md:px-5 py-4"
                     style={{ background: "rgba(83,83,83,0.35)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
                     <ReactCountryFlag countryCode={iso} svg style={{ width: "2em", height: "2em", borderRadius: "4px", flexShrink: 0 }} />
@@ -360,7 +360,7 @@ export default function DashboardClient({
                       <p className="text-xs text-white/40 mt-0.5">{date}</p>
                     </div>
 
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
                       {/* Status badge */}
                       <span
                         className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-full"

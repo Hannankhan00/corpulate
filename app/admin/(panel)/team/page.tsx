@@ -12,7 +12,7 @@ export default async function TeamPage() {
   const members = await getAdminTeam();
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8 pt-14 md:pt-8">
       <TeamClient
         members={members}
         actorId={admin.id}

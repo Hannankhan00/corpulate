@@ -71,7 +71,7 @@ const ADDONS = [
 
 function Stepper({ current }: { current: number }) {
   return (
-    <div className="w-65 shrink-0 rounded-[15px] p-7 flex flex-col" style={{ background: "rgba(20,20,22,0.85)", border: "1px solid rgba(255,255,255,0.07)" }}>
+    <div className="hidden md:flex w-65 shrink-0 rounded-[15px] p-7 flex-col" style={{ background: "rgba(20,20,22,0.85)", border: "1px solid rgba(255,255,255,0.07)" }}>
       <p className="text-xs font-bold tracking-widest uppercase text-white/40 mb-8">Setup Progress</p>
       <div className="flex flex-col flex-1">
         {STEPS.map((step, i) => {
@@ -139,8 +139,8 @@ function AddOnsContent() {
     <div className="flex h-screen overflow-hidden" style={{ background: PAGE_BG }}>
       <Sidebar countryCode={country === "uk" ? "GB" : "US"} activeItem="home" />
 
-      <main className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-        <div className="flex items-center gap-4 rounded-[50px] px-5 py-3.5 shrink-0" style={{ background: "#1a1a1c", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.3)" }}>
+      <main className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-4">
+        <div className="flex items-center gap-3 rounded-[50px] pl-12 pr-4 md:px-5 py-3.5 shrink-0" style={{ background: "#1a1a1c", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.3)" }}>
           <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ background: "linear-gradient(135deg,#7C3AED,#06B6D4)" }}>Q</div>
           <div className="flex-1">
             <p className="font-semibold text-fg text-sm">Complete your profile</p>
@@ -159,11 +159,11 @@ function AddOnsContent() {
         <div className="flex gap-5 flex-1 min-h-0">
           <Stepper current={6} />
 
-          <div className="flex-1 rounded-[15px] p-8 flex flex-col overflow-y-auto" style={{ background: "rgba(83,83,83,0.25)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="flex-1 rounded-[15px] p-4 md:p-8 flex flex-col overflow-y-auto" style={{ background: "rgba(83,83,83,0.25)", border: "1px solid rgba(255,255,255,0.07)" }}>
             <h2 className="text-xl font-bold text-white mb-1">Additional Services</h2>
             <p className="text-sm text-white/50 mb-6">Enhance your formation package with these optional services. You can skip this step if you don&apos;t need any.</p>
 
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
               {ADDONS.map((addon) => {
                 const isSelected = selected.has(addon.id);
                 return (

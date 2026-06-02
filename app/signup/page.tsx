@@ -94,7 +94,7 @@ export default function SignupPage() {
     >
       {/* Frosted glass card */}
       <div
-        className="w-full max-w-140 rounded-[20px] px-10 py-10"
+        className="w-full max-w-140 rounded-[20px] px-5 py-8 sm:px-10 sm:py-10"
         style={{
           background: "rgba(217,217,217,0.12)",
           backdropFilter: "blur(10px)",
@@ -112,7 +112,7 @@ export default function SignupPage() {
 
         <form action={action} className="space-y-3">
           {/* First + Last Name */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <TallInput label="First Name" id="firstName" name="firstName" placeholder="John" autoComplete="given-name" />
             <TallInput label="Last Name" id="lastName" name="lastName" placeholder="Doe" autoComplete="family-name" />
           </div>
@@ -176,7 +176,7 @@ export default function SignupPage() {
           </div>
 
           {/* Password + Confirm */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <TallInput
               label="Password"
               id="password"

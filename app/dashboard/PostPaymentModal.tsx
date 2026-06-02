@@ -112,7 +112,7 @@ export default function PostPaymentModal({
       >
         {/* ── Banner ─────────────────────────────────────────── */}
         <div
-          className="shrink-0 px-8 py-5 flex items-start gap-4"
+          className="shrink-0 px-4 md:px-8 py-5 flex items-start gap-4"
           style={{
             background: "linear-gradient(90deg, rgba(234,88,12,0.22) 0%, rgba(234,88,12,0.07) 100%)",
             borderBottom: "1px solid rgba(234,88,12,0.25)",
@@ -201,14 +201,14 @@ export default function PostPaymentModal({
           ))}
 
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto scrollbar-thin px-8 py-6">
+          <div className="flex-1 overflow-y-auto scrollbar-thin px-4 md:px-8 py-6">
             {state && "error" in state && (
               <p className="text-red-400 text-sm mb-4 px-1">{String(state.error)}</p>
             )}
 
             {/* ── Step 1: Personal Info ── */}
             <div style={{ display: step === 1 ? "block" : "none" }}>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                 {fields.map((f) => {
                   const meta = FIELD_META[f.fieldKey];
                   const name = FIELD_KEYS[f.fieldKey];
@@ -217,7 +217,7 @@ export default function PostPaymentModal({
                   const wide = meta.wide || meta.type === "date";
 
                   return (
-                    <div key={f.fieldKey} className={wide ? "col-span-2" : "col-span-1"}>
+                    <div key={f.fieldKey} className={wide ? "sm:col-span-2" : ""}>
                       <label className="block text-xs text-white/45 mb-2 uppercase tracking-wider">{label}</label>
                       {meta.type === "date" ? (
                         <input
@@ -256,7 +256,7 @@ export default function PostPaymentModal({
               <p className="text-xs text-white/35 mb-5 leading-relaxed">
                 Upload clear scans or photos. Toggle &quot;Upload Later&quot; for any document you don&apos;t have ready — you can submit it afterwards.
               </p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {documents.map((doc) => {
                   const fieldKey  = `doc_${doc.name.replace(/\s+/g, "_")}`;
                   const isSkipped = skipped[doc.name] ?? false;
@@ -341,7 +341,7 @@ export default function PostPaymentModal({
 
           {/* ── Footer navigation ─────────────────────────── */}
           <div
-            className="shrink-0 px-8 py-5 flex items-center justify-between gap-4"
+            className="shrink-0 px-4 md:px-8 py-4 md:py-5 flex flex-wrap items-center justify-between gap-3"
             style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
           >
             <p className="text-xs text-white/25 leading-relaxed max-w-sm">
