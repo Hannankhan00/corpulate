@@ -423,7 +423,7 @@ export default function CheckoutClient({
           <div className="flex-1 flex flex-col xl:flex-row gap-5 min-h-0 overflow-y-auto">
 
             {/* ── Order Summary ────────────────────────────── */}
-            <div className="w-full xl:flex-1 rounded-[18px] flex flex-col overflow-hidden" style={{ background: "rgba(14,14,16,0.92)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="w-full xl:w-80 xl:shrink-0 rounded-[18px] flex flex-col overflow-hidden" style={{ background: "rgba(14,14,16,0.92)", border: "1px solid rgba(255,255,255,0.08)" }}>
 
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
@@ -523,7 +523,7 @@ export default function CheckoutClient({
             </div>
 
             {/* ── Payment Form ─────────────────────────────── */}
-            <div className="w-full xl:w-100 xl:shrink-0 rounded-[18px] flex flex-col overflow-hidden" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="w-full xl:flex-1 rounded-[18px] flex flex-col overflow-hidden" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
 
               {/* Header */}
               <div className="px-7 pt-6 pb-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
