@@ -532,103 +532,142 @@ function PaymentModal({ open, onClose, finalTotal, bankDetails, appData, country
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.78)", backdropFilter: "blur(10px)" }}
+      style={{ background: "rgba(0,0,0,0.82)", backdropFilter: "blur(12px)" }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <style>{`@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
-      <div className="relative w-full max-w-md rounded-2xl overflow-hidden flex flex-col"
-        style={{ background: "#0f0f11", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 30px 80px rgba(0,0,0,0.7)", animation: "modalIn 0.22s cubic-bezier(0.16,1,0.3,1)", maxHeight: "92vh" }}>
+      <style>{`
+        @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        @keyframes stepFade{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:translateX(0)}}
+      `}</style>
 
-        {/* Modal header */}
-        <div className="flex items-center justify-between px-5 py-4 shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-          <div className="flex items-center gap-2.5">
+      <div className="relative w-full max-w-145 rounded-3xl overflow-hidden flex flex-col"
+        style={{ background: "linear-gradient(180deg,#141416 0%,#0f0f11 100%)", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04) inset", animation: "modalIn 0.25s cubic-bezier(0.16,1,0.3,1)", maxHeight: "92vh" }}>
+
+        {/* Gradient top accent */}
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(148,82,232,0.6),rgba(233,69,168,0.4),transparent)" }} />
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-7 py-5 shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="flex items-center gap-3">
             {step !== "method" && (
               <button type="button" onClick={goBack}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+                className="w-8 h-8 flex items-center justify-center rounded-xl text-white/40 hover:text-white transition-all cursor-pointer"
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={14} height={14}><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
               </button>
             )}
-            <h2 className="text-sm font-bold text-white">{titles[step]}</h2>
+            <div>
+              <h2 className="font-bold text-white" style={{ fontSize: "1rem" }}>{titles[step]}</h2>
+              <p className="text-[11px] text-white/30 mt-0.5">
+                {step === "method" ? "Select how you'd like to complete your purchase" : step === "card" ? "Your payment is secured and encrypted" : "Transfer funds and upload your proof"}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-[11px] text-white/30 font-mono">${finalTotal}</span>
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="text-right hidden sm:block">
+              <p className="text-[10px] text-white/30 uppercase tracking-widest">Total</p>
+              <p className="text-lg font-black text-white">${finalTotal}</p>
+            </div>
             <button type="button" onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-white/35 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+              className="w-8 h-8 flex items-center justify-center rounded-xl text-white/35 hover:text-white transition-all cursor-pointer"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={15} height={15}><path d="M18 6L6 18M6 6l12 12" /></svg>
             </button>
           </div>
         </div>
 
-        {/* Modal body */}
+        {/* Body */}
         <div className="overflow-y-auto flex-1">
+
           {/* ── Method selection ── */}
           {step === "method" && (
-            <div className="p-5 space-y-3">
-              <div className="flex items-baseline justify-between mb-1">
-                <p className="text-sm text-white/50">How would you like to pay?</p>
-                <p className="text-xl font-black text-white">${finalTotal}</p>
+            <div className="px-7 py-6 space-y-5" style={{ animation: "stepFade 0.2s ease-out" }}>
+
+              {/* Total banner */}
+              <div className="flex items-center justify-between px-5 py-4 rounded-2xl" style={{ background: "linear-gradient(135deg,rgba(148,82,232,0.1),rgba(233,69,168,0.06))", border: "1px solid rgba(148,82,232,0.18)" }}>
+                <div>
+                  <p className="text-[10px] text-white/35 uppercase tracking-widest mb-1">Amount due</p>
+                  <p className="text-3xl font-black text-white">${finalTotal}</p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,rgba(148,82,232,0.25),rgba(233,69,168,0.15))", border: "1px solid rgba(148,82,232,0.25)" }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#C084FC" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={22} height={22}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-1">
+              {/* Method cards — horizontal layout */}
+              <div className="space-y-3">
                 {/* Card */}
                 <button type="button" onClick={selectCard}
-                  className="flex flex-col items-center gap-3 p-5 rounded-2xl transition-all cursor-pointer group"
-                  style={{ background: "rgba(148,82,232,0.07)", border: "1px solid rgba(148,82,232,0.22)" }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(148,82,232,0.14)"; el.style.border = "1px solid rgba(148,82,232,0.5)"; el.style.transform = "translateY(-1px)"; }}
-                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(148,82,232,0.07)"; el.style.border = "1px solid rgba(148,82,232,0.22)"; el.style.transform = "translateY(0)"; }}>
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,rgba(148,82,232,0.25),rgba(233,69,168,0.15))", border: "1px solid rgba(148,82,232,0.25)" }}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#C084FC" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={20} height={20}><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                  className="w-full flex items-center gap-5 px-5 py-4 rounded-2xl transition-all cursor-pointer group text-left"
+                  style={{ background: "rgba(148,82,232,0.07)", border: "1px solid rgba(148,82,232,0.2)" }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(148,82,232,0.13)"; el.style.border = "1px solid rgba(148,82,232,0.45)"; el.style.transform = "translateX(2px)"; }}
+                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(148,82,232,0.07)"; el.style.border = "1px solid rgba(148,82,232,0.2)"; el.style.transform = "translateX(0)"; }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg,rgba(148,82,232,0.3),rgba(233,69,168,0.2))", border: "1px solid rgba(148,82,232,0.3)" }}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#C084FC" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={22} height={22}><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-bold text-white">Card</p>
-                    <p className="text-[11px] text-white/35 mt-0.5">Instant</p>
-                  </div>
-                  <div className="flex gap-1">
-                    <div className="rounded overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <svg viewBox="0 0 32 20" fill="none" width={26} height={16}><rect width="32" height="20" rx="3" fill="#1A1F71"/><text x="3" y="14" fill="#F9A51A" fontSize="7" fontFamily="sans-serif" fontWeight="bold">VISA</text></svg>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-bold text-white">Credit / Debit Card</p>
+                      <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: "rgba(16,185,129,0.15)", color: "#10B981", border: "1px solid rgba(16,185,129,0.2)" }}>Instant</span>
                     </div>
-                    <div className="rounded overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <svg viewBox="0 0 32 20" fill="none" width={26} height={16}><rect width="32" height="20" rx="3" fill="#252525"/><circle cx="12" cy="10" r="6" fill="#EB001B"/><circle cx="20" cy="10" r="6" fill="#F79E1B"/><path d="M16 5.5a6 6 0 010 9A6 6 0 0116 5.5z" fill="#FF5F00"/></svg>
+                    <div className="flex items-center gap-1.5">
+                      {[
+                        <><rect width="32" height="20" rx="3" fill="#1A1F71"/><text x="3" y="14" fill="#F9A51A" fontSize="7" fontFamily="sans-serif" fontWeight="bold">VISA</text></>,
+                        <><rect width="32" height="20" rx="3" fill="#252525"/><circle cx="12" cy="10" r="6" fill="#EB001B"/><circle cx="20" cy="10" r="6" fill="#F79E1B"/><path d="M16 5.5a6 6 0 010 9A6 6 0 0116 5.5z" fill="#FF5F00"/></>,
+                        <><rect width="32" height="20" rx="3" fill="#1A1F71"/><text x="3" y="14" fill="white" fontSize="6" fontFamily="sans-serif" fontWeight="bold">AMEX</text></>,
+                      ].map((path, i) => (
+                        <div key={i} className="rounded overflow-hidden opacity-70" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                          <svg viewBox="0 0 32 20" fill="none" width={26} height={16}>{path}</svg>
+                        </div>
+                      ))}
+                      <span className="text-[10px] text-white/25">& more</span>
                     </div>
                   </div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="rgba(148,82,232,0.5)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={16} height={16} className="shrink-0"><path d="M9 18l6-6-6-6" /></svg>
                 </button>
 
                 {/* Bank transfer */}
                 {bankDetails ? (
                   <button type="button" onClick={() => setStep("bank")}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl transition-all cursor-pointer"
-                    style={{ background: "rgba(13,100,139,0.07)", border: "1px solid rgba(13,100,139,0.22)" }}
-                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(13,100,139,0.14)"; el.style.border = "1px solid rgba(13,100,139,0.5)"; el.style.transform = "translateY(-1px)"; }}
-                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(13,100,139,0.07)"; el.style.border = "1px solid rgba(13,100,139,0.22)"; el.style.transform = "translateY(0)"; }}>
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,rgba(13,100,139,0.25),rgba(6,182,212,0.15))", border: "1px solid rgba(13,100,139,0.25)" }}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={20} height={20}><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                    className="w-full flex items-center gap-5 px-5 py-4 rounded-2xl transition-all cursor-pointer text-left"
+                    style={{ background: "rgba(13,100,139,0.07)", border: "1px solid rgba(13,100,139,0.2)" }}
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(13,100,139,0.13)"; el.style.border = "1px solid rgba(13,100,139,0.45)"; el.style.transform = "translateX(2px)"; }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(13,100,139,0.07)"; el.style.border = "1px solid rgba(13,100,139,0.2)"; el.style.transform = "translateX(0)"; }}>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg,rgba(13,100,139,0.3),rgba(6,182,212,0.2))", border: "1px solid rgba(13,100,139,0.3)" }}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={22} height={22}><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                     </div>
-                    <div className="text-center">
-                      <p className="text-sm font-bold text-white">Bank Transfer</p>
-                      <p className="text-[11px] text-white/35 mt-0.5">1–2 days</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-sm font-bold text-white">Bank Transfer</p>
+                        <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: "rgba(13,100,139,0.2)", color: "#22D3EE", border: "1px solid rgba(13,100,139,0.25)" }}>Manual Review</span>
+                      </div>
+                      <p className="text-[11px] text-white/35">Transfer directly to our bank account — approved within 1–2 business days</p>
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: "rgba(13,100,139,0.2)", color: "#22D3EE", border: "1px solid rgba(13,100,139,0.25)" }}>
-                      Manual Review
-                    </span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(34,211,238,0.4)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={16} height={16} className="shrink-0"><path d="M9 18l6-6-6-6" /></svg>
                   </button>
                 ) : (
-                  <div className="flex flex-col items-center gap-3 p-5 rounded-2xl opacity-35 cursor-not-allowed select-none"
+                  <div className="w-full flex items-center gap-5 px-5 py-4 rounded-2xl opacity-30 cursor-not-allowed select-none"
                     style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.04)" }}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={20} height={20}><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={22} height={22}><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                     </div>
-                    <div className="text-center">
+                    <div>
                       <p className="text-sm font-bold text-white/50">Bank Transfer</p>
-                      <p className="text-[11px] text-white/25 mt-0.5">Unavailable</p>
+                      <p className="text-[11px] text-white/25 mt-0.5">Currently unavailable</p>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-center gap-5 pt-2">
-                {["256-bit SSL", "PCI Compliant", "Encrypted"].map((l, i) => (
-                  <div key={i} className="flex items-center gap-1.5 text-[10px] text-white/18">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={10} height={10}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                    {l}
+              {/* Trust row */}
+              <div className="flex items-center justify-center gap-6 py-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                {[
+                  { icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></>, label: "SSL Encrypted" },
+                  { icon: <><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></>, label: "PCI Compliant" },
+                  { icon: <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></>, label: "Secure Checkout" },
+                ].map(({ icon, label }, i) => (
+                  <div key={i} className="flex items-center gap-1.5 text-[10px] text-white/20">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={11} height={11}>{icon}</svg>
+                    {label}
                   </div>
                 ))}
               </div>
@@ -637,17 +676,25 @@ function PaymentModal({ open, onClose, finalTotal, bankDetails, appData, country
 
           {/* ── Card step ── */}
           {step === "card" && (
-            <div className="p-5">
+            <div className="px-7 py-6" style={{ animation: "stepFade 0.2s ease-out" }}>
               {cardError && (
-                <div className="flex items-start gap-2.5 px-4 py-3 rounded-[10px] mb-4" style={{ background: "rgba(255,91,98,0.10)", border: "1px solid rgba(255,91,98,0.25)" }}>
+                <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl mb-5" style={{ background: "rgba(255,91,98,0.10)", border: "1px solid rgba(255,91,98,0.25)" }}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="#FF5B62" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={14} height={14} className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                   <p className="text-xs text-[#FF5B62]">{cardError}</p>
                 </div>
               )}
               {cardLoading && (
-                <div className="flex flex-col items-center justify-center h-40 gap-3">
-                  <svg className="animate-spin" viewBox="0 0 24 24" fill="none" stroke="rgba(148,82,232,0.5)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={28} height={28}><path d="M21 12a9 9 0 11-6.219-8.56" /></svg>
-                  <p className="text-xs text-white/25">Initializing secure payment...</p>
+                <div className="flex flex-col items-center justify-center h-48 gap-4">
+                  <div className="relative">
+                    <svg className="animate-spin" viewBox="0 0 24 24" fill="none" stroke="rgba(148,82,232,0.4)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={36} height={36}><path d="M21 12a9 9 0 11-6.219-8.56" /></svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(148,82,232,0.7)" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={14} height={14}><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-white/50 font-medium">Setting up secure payment</p>
+                    <p className="text-xs text-white/20 mt-0.5">This only takes a moment...</p>
+                  </div>
                 </div>
               )}
               {!cardLoading && cardSecret && (
@@ -663,7 +710,7 @@ function PaymentModal({ open, onClose, finalTotal, bankDetails, appData, country
 
           {/* ── Bank step ── */}
           {step === "bank" && bankDetails && (
-            <div className="p-5">
+            <div className="px-7 py-6" style={{ animation: "stepFade 0.2s ease-out" }}>
               <BankTransferStep
                 bankDetails={bankDetails} finalTotal={finalTotal}
                 appData={appData} country={country} addons={addons}
