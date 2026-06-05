@@ -86,10 +86,25 @@ model Application {
   addons          String?  @db.Text
   stripePaymentId String?
   amountPaid      Int?
+  promoCode       String?
+  discountAmount  Int?
   adminNotes      String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   documents     ApplicationDocument[]
+}
+
+model PromoCode {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  discountType  String
+  discountValue Int
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  isActive      Boolean   @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model ApplicationDocument {

@@ -3,17 +3,17 @@ import { prisma } from "@/lib/prisma";
 import CheckoutClient from "./CheckoutClient";
 
 const ADDON_PRICES: Record<string, number> = {
-  "registered-agent":   99,
-  "ein":                49,
+  "registered-agent":    99,
+  "ein":                 49,
   "operating-agreement": 79,
-  "annual-report":      149,
+  "annual-report":       149,
 };
 
 const ADDON_NAMES: Record<string, string> = {
-  "registered-agent":   "Registered Agent Service",
-  "ein":                "EIN / Tax ID Application",
+  "registered-agent":    "Registered Agent Service",
+  "ein":                 "EIN / Tax ID Application",
   "operating-agreement": "Operating Agreement",
-  "annual-report":      "Annual Report Filing",
+  "annual-report":       "Annual Report Filing",
 };
 
 export default async function CheckoutPage({
@@ -24,7 +24,10 @@ export default async function CheckoutPage({
     state?: string; stateFee?: string; addons?: string;
   }>;
 }) {
-  const { country = "uk", type = "llc", plan: planSlug = "starter", billing = "monthly", state = "", stateFee = "0", addons = "" } = await searchParams;
+  const {
+    country = "uk", type = "llc", plan: planSlug = "starter",
+    billing = "monthly", state = "", stateFee = "0", addons = "",
+  } = await searchParams;
 
   const planRecord = await prisma.servicePlan.findUnique({ where: { slug: planSlug } });
   if (!planRecord) redirect("/onboarding/plan-selection");
@@ -42,8 +45,10 @@ export default async function CheckoutPage({
     price: ADDON_PRICES[id] ?? 0,
   }));
   const addonTotal = addonItems.reduce((s, a) => s + a.price, 0);
-
   const total = planPrice + stateFeeNum + addonTotal;
+
+  let planFeatures: string[] = [];
+  try { planFeatures = JSON.parse(planRecord.features) as string[]; } catch { /* empty */ }
 
   return (
     <CheckoutClient
@@ -53,6 +58,7 @@ export default async function CheckoutPage({
       billing={billing}
       planName={planRecord.name}
       planPrice={planPrice}
+      planFeatures={planFeatures}
       state={state || null}
       stateFee={stateFeeNum}
       addonItems={addonItems}

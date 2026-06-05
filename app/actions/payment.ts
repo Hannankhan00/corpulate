@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { redeemPromoCode } from "@/app/actions/promo";
 
 function getStripe() {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is not set");
@@ -41,32 +42,38 @@ export async function finalizeApplication(data: {
   addons?: string | null;
   stripePaymentId: string;
   amountPaid: number;
+  promoCode?: string | null;
+  discountAmount?: number | null;
 }) {
   const session = await getSession();
   if (!session?.userId) redirect("/");
 
   await prisma.application.create({
     data: {
-      userId: session.userId,
-      companyName:    data.companyName    || null,
-      companyName2:   data.companyName2   || null,
-      companyName3:   data.companyName3   || null,
-      description:    data.description    || null,
-      industry:       data.industry       || null,
-      revenue:        data.revenue        || null,
-      website:        data.website        || null,
-      companyType:    data.companyType,
-      plan:           data.plan,
-      billingPeriod:  data.billingPeriod,
-      state:          data.state          || null,
-      country:        data.country,
-      addons:         data.addons         || null,
+      userId:          session.userId,
+      companyName:     data.companyName    || null,
+      companyName2:    data.companyName2   || null,
+      companyName3:    data.companyName3   || null,
+      description:     data.description   || null,
+      industry:        data.industry      || null,
+      revenue:         data.revenue       || null,
+      website:         data.website       || null,
+      companyType:     data.companyType,
+      plan:            data.plan,
+      billingPeriod:   data.billingPeriod,
+      state:           data.state         || null,
+      country:         data.country,
+      addons:          data.addons        || null,
       stripePaymentId: data.stripePaymentId,
-      amountPaid:     data.amountPaid,
-      isPaid:         true,
-      status:         "pending",
+      amountPaid:      data.amountPaid,
+      promoCode:       data.promoCode     || null,
+      discountAmount:  data.discountAmount || null,
+      isPaid:          true,
+      status:          "pending",
     },
   });
+
+  if (data.promoCode) await redeemPromoCode(data.promoCode);
 
   redirect("/dashboard");
 }

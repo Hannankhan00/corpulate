@@ -79,6 +79,13 @@ const PlansIcon = () => (
   </svg>
 );
 
+const PromoIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+    <line x1="7" y1="7" x2="7.01" y2="7" />
+  </svg>
+);
+
 const MenuIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={20} height={20}>
     <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
@@ -109,6 +116,10 @@ const NAV_PLANS = {
   id: "plans", label: "Plans", href: "/admin/plans", icon: <PlansIcon />,
 };
 
+const NAV_PROMO = {
+  id: "promo-codes", label: "Promo Codes", href: "/admin/promo-codes", icon: <PromoIcon />,
+};
+
 export default function AdminSidebar({
   name,
   role,
@@ -123,7 +134,7 @@ export default function AdminSidebar({
   const navItems =
     role === "SUPPORT"
       ? NAV_BASE
-      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_TEAM];
+      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_PROMO, NAV_TEAM];
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
