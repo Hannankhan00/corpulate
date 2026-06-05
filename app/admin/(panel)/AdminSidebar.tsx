@@ -120,6 +120,16 @@ const NAV_PROMO = {
   id: "promo-codes", label: "Promo Codes", href: "/admin/promo-codes", icon: <PromoIcon />,
 };
 
+const NAV_PAYMENTS = {
+  id: "payments", label: "Payments", href: "/admin/payments",
+  icon: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+      <line x1="12" y1="1" x2="12" y2="23" />
+      <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+    </svg>
+  ),
+};
+
 const NAV_TRANSFERS = {
   id: "transfers", label: "Transfers", href: "/admin/transfers",
   icon: (
@@ -151,8 +161,8 @@ export default function AdminSidebar({
 
   const navItems =
     role === "SUPPORT"
-      ? [...NAV_BASE, NAV_TRANSFERS]
-      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_PROMO, NAV_TRANSFERS, NAV_BANK_SETTINGS, NAV_TEAM];
+      ? [...NAV_BASE, NAV_PAYMENTS, NAV_TRANSFERS]
+      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_PROMO, NAV_PAYMENTS, NAV_TRANSFERS, NAV_BANK_SETTINGS, NAV_TEAM];
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
