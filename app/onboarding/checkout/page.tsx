@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import CheckoutClient from "./CheckoutClient";
+import { getPublicBankDetails } from "@/app/actions/bankTransfer";
 
 const ADDON_PRICES: Record<string, number> = {
   "registered-agent":    99,
@@ -29,7 +30,10 @@ export default async function CheckoutPage({
     billing = "monthly", state = "", stateFee = "0", addons = "",
   } = await searchParams;
 
-  const planRecord = await prisma.servicePlan.findUnique({ where: { slug: planSlug } });
+  const [planRecord, bankDetails] = await Promise.all([
+    prisma.servicePlan.findUnique({ where: { slug: planSlug } }),
+    getPublicBankDetails(),
+  ]);
   if (!planRecord) redirect("/onboarding/plan-selection");
 
   const planPrice = billing === "annual"
@@ -65,6 +69,7 @@ export default async function CheckoutPage({
       addonTotal={addonTotal}
       total={total}
       addons={addons}
+      bankDetails={bankDetails}
     />
   );
 }

@@ -120,6 +120,24 @@ const NAV_PROMO = {
   id: "promo-codes", label: "Promo Codes", href: "/admin/promo-codes", icon: <PromoIcon />,
 };
 
+const NAV_TRANSFERS = {
+  id: "transfers", label: "Transfers", href: "/admin/transfers",
+  icon: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  ),
+};
+
+const NAV_BANK_SETTINGS = {
+  id: "bank-settings", label: "Bank Settings", href: "/admin/bank-settings",
+  icon: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+};
+
 export default function AdminSidebar({
   name,
   role,
@@ -133,8 +151,8 @@ export default function AdminSidebar({
 
   const navItems =
     role === "SUPPORT"
-      ? NAV_BASE
-      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_PROMO, NAV_TEAM];
+      ? [...NAV_BASE, NAV_TRANSFERS]
+      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_PROMO, NAV_TRANSFERS, NAV_BANK_SETTINGS, NAV_TEAM];
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";

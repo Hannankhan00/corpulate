@@ -89,6 +89,9 @@ model Application {
   promoCode       String?
   discountAmount  Int?
   adminNotes      String?  @db.Text
+  paymentMethod   String?
+  transferStatus  String?
+  transferNote    String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   documents     ApplicationDocument[]
@@ -178,6 +181,19 @@ model ServicePlan {
   sortOrder         Int      @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model BankDetails {
+  id            String   @id @default(cuid())
+  bankName      String   @default("")
+  accountName   String   @default("")
+  accountNumber String   @default("")
+  sortCode      String   @default("")
+  iban          String   @default("")
+  swift         String   @default("")
+  reference     String   @default("")
+  notes         String?  @db.Text
+  updatedAt     DateTime @updatedAt
 }
 
 model ServiceCompanyType {
