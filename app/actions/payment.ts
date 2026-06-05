@@ -19,7 +19,7 @@ export async function createPaymentIntent(amountCents: number): Promise<{ client
   const intent = await stripe.paymentIntents.create({
     amount: amountCents,
     currency: "usd",
-    automatic_payment_methods: { enabled: true },
+    payment_method_types: ["card"],
   });
 
   if (!intent.client_secret) throw new Error("Failed to create payment intent");
