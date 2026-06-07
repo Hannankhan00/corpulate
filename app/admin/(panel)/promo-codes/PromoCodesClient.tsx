@@ -90,9 +90,9 @@ function PromoRow({ code }: { code: PromoCode }) {
       }}
     >
       <div className="flex items-center gap-4 px-5 py-4 flex-wrap">
-        <div className="flex-1 min-w-[160px]">
+        <div className="flex-1 min-w-40">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <code className="text-base font-black tracking-widest text-white">{code.code}</code>
+            <code className="text-base font-black tracking-widest">{code.code}</code>
             {!code.isActive && <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>Disabled</span>}
             {isExpired && <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(239,68,68,0.12)", color: "#F87171" }}>Expired</span>}
             {isExhausted && <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(251,191,36,0.12)", color: "#FBBF24" }}>Limit reached</span>}

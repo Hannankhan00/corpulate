@@ -49,6 +49,11 @@ const inputCls =
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined);
   const [showPassword, setShowPassword] = useState(false);
+  const [oauthError] = useState(() =>
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("error")
+      ? "Google sign-in failed. Please try again."
+      : ""
+  );
 
   return (
     <div className="min-h-screen flex bg-base">
@@ -162,14 +167,17 @@ export default function LoginPage() {
 
           {/* Social auth */}
           <div className="mb-6">
-            <button
-              type="button"
+            <a
+              href="/api/auth/google"
               className="w-full flex items-center justify-center gap-2.5 h-11 rounded-lg text-sm font-medium text-fg cursor-pointer transition-colors duration-200 hover:bg-white/[0.07] active:scale-[0.98]"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
             >
               <GoogleIcon />
               Continue with Google
-            </button>
+            </a>
+            {oauthError && (
+              <p className="text-[11px] text-red-400 mt-2 text-center">{oauthError}</p>
+            )}
           </div>
 
           {/* OR divider */}
