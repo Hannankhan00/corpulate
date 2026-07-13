@@ -105,10 +105,17 @@ const XIcon = () => (
   </svg>
 );
 
+const NoticesIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+  </svg>
+);
+
 const NAV_BASE = [
   { id: "overview",   label: "Overview",    href: "/admin",            icon: <OverviewIcon /> },
   { id: "customers",  label: "Customers",   href: "/admin/customers",  icon: <CustomersIcon /> },
   { id: "work-queue", label: "Work Queue",  href: "/admin/work-queue", icon: <WorkQueueIcon /> },
+  { id: "notices",    label: "Notices",     href: "/admin/notices",    icon: <NoticesIcon /> },
 ];
 
 const NAV_TEAM = {
