@@ -118,7 +118,7 @@ model ApplicationDocument {
   fileName      String
   mimeType      String
   fileSize      Int
-  fileData      Bytes       @db.MediumBlob
+  fileKey       String
   uploadedAt    DateTime    @default(now())
 }
 

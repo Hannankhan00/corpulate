@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
             width={140}
             height={44}
             priority
-            style={{ height: "auto" }}
+            style={{ width: "auto", height: "auto" }}
           />
         </div>
 

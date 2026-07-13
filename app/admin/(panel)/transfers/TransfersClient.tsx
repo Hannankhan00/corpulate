@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { approveTransfer, rejectTransfer } from "@/app/actions/bankTransfer";
 
-type Screenshot = { id: string; fileName: string; mimeType: string; dataUrl: string } | null;
+type Screenshot = { id: string; fileName: string; mimeType: string; dataUrl: string | null } | null;
 type Transfer = {
   id: string; companyName: string | null; plan: string | null; amountPaid: number | null;
   transferStatus: string | null; transferNote: string | null; createdAt: string;
@@ -172,7 +172,7 @@ function TransferRow({ transfer, onUpdated }: { transfer: Transfer; onUpdated: (
                 <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
                   {transfer.screenshot.mimeType.startsWith("image/") ? (
                     <img
-                      src={transfer.screenshot.dataUrl}
+                      src={transfer.screenshot.dataUrl || undefined}
                       alt="Transfer proof"
                       className="w-full object-contain max-h-72"
                       style={{ background: "#0a0a0c" }}
@@ -185,7 +185,7 @@ function TransferRow({ transfer, onUpdated }: { transfer: Transfer; onUpdated: (
                   )}
                   <div className="px-4 py-3 flex items-center justify-between" style={{ borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.02)" }}>
                     <p className="text-xs text-white/35 truncate">{transfer.screenshot.fileName}</p>
-                    <a href={transfer.screenshot.dataUrl} download={transfer.screenshot.fileName}
+                    <a href={transfer.screenshot.dataUrl || undefined} download={transfer.screenshot.fileName}
                       className="text-xs text-white/40 hover:text-white transition-colors cursor-pointer px-2.5 py-1 rounded-lg"
                       style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}>
                       Download

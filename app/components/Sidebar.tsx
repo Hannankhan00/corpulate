@@ -217,7 +217,7 @@ export default function Sidebar({
 
         {/* Logo */}
         <div className="px-4 pt-5 pb-4 shrink-0">
-          <Image src="/assets/logo.png" alt="Corpulate" width={130} height={40} priority style={{ height: "auto" }} />
+          <Image src="/assets/logo.png" alt="Corpulate" width={130} height={40} priority style={{ width: "auto", height: "auto" }} />
         </div>
 
         {/* User dropdown button */}

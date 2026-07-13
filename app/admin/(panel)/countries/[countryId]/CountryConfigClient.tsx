@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useActionState } from "react";
+import { useState, useTransition, useActionState, useEffect } from "react";
 import ReactCountryFlag from "react-country-flag";
 import {
   addServiceCountryState,
@@ -88,9 +88,11 @@ type Tab = "states" | "documents" | "fields" | "companyTypes";
 function AddStateForm({ countryId, onDone }: { countryId: string; onDone: () => void }) {
   const [state, action, pending] = useActionState(addServiceCountryState, null);
 
-  if (state && "ok" in state) {
-    onDone();
-  }
+  useEffect(() => {
+    if (state && "ok" in state) {
+      onDone();
+    }
+  }, [state, onDone]);
 
   return (
     <form action={action} className="space-y-3 mt-4">
@@ -144,9 +146,11 @@ function EditStateForm({ state: s, countryId, onDone }: { state: State; countryI
   const [result, action, pending] = useActionState(updateServiceCountryState, null);
   const prosValue = s.pros ? (JSON.parse(s.pros) as string[]).join("\n") : "";
 
-  if (result && "ok" in result) {
-    onDone();
-  }
+  useEffect(() => {
+    if (result && "ok" in result) {
+      onDone();
+    }
+  }, [result, onDone]);
 
   return (
     <form action={action} className="space-y-3 mt-3">
@@ -303,9 +307,11 @@ function StatesTab({ country }: { country: Country }) {
 function AddDocForm({ countryId, onDone }: { countryId: string; onDone: () => void }) {
   const [state, action, pending] = useActionState(addServiceCountryDoc, null);
 
-  if (state && "ok" in state) {
-    onDone();
-  }
+  useEffect(() => {
+    if (state && "ok" in state) {
+      onDone();
+    }
+  }, [state, onDone]);
 
   return (
     <form action={action} className="space-y-3 mt-4">
@@ -491,7 +497,9 @@ const inputCls = "w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 te
 function AddCompanyTypeForm({ countryId, onDone }: { countryId: string; onDone: () => void }) {
   const [state, action, pending] = useActionState(addServiceCompanyType, null);
 
-  if (state && "ok" in state) onDone();
+  useEffect(() => {
+    if (state && "ok" in state) onDone();
+  }, [state, onDone]);
 
   return (
     <form action={action} className="space-y-3 mt-4">
@@ -537,7 +545,9 @@ function AddCompanyTypeForm({ countryId, onDone }: { countryId: string; onDone: 
 function EditCompanyTypeForm({ ct, countryId, onDone }: { ct: CompanyType; countryId: string; onDone: () => void }) {
   const [result, action, pending] = useActionState(updateServiceCompanyType, null);
 
-  if (result && "ok" in result) onDone();
+  useEffect(() => {
+    if (result && "ok" in result) onDone();
+  }, [result, onDone]);
 
   return (
     <form action={action} className="space-y-3 mt-3">

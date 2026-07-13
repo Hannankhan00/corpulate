@@ -6,6 +6,7 @@ import { requireAdminSession } from "@/app/actions/admin-auth";
 import { redirect } from "next/navigation";
 import { redeemPromoCode } from "@/app/actions/promo";
 import { revalidatePath } from "next/cache";
+import { uploadFile, getSignedFileUrl } from "@/lib/s3";
 
 export async function getPublicBankDetails() {
   const d = await prisma.bankDetails.findFirst({ orderBy: { updatedAt: "desc" } });
@@ -66,6 +67,9 @@ export async function submitBankTransferProof(
     },
   });
 
+  const fileKey = `transfers/${app.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+  await uploadFile(fileKey, buffer, file.type);
+
   await prisma.applicationDocument.create({
     data: {
       applicationId: app.id,
@@ -73,7 +77,7 @@ export async function submitBankTransferProof(
       fileName: file.name,
       mimeType: file.type,
       fileSize: file.size,
-      fileData: buffer,
+      fileKey,
     },
   });
 
@@ -94,27 +98,34 @@ export async function getPendingTransfers() {
     orderBy: { createdAt: "desc" },
   });
 
-  return rows.map((r) => ({
-    id:             r.id,
-    companyName:    r.companyName,
-    plan:           r.plan,
-    amountPaid:     r.amountPaid,
-    transferStatus: r.transferStatus,
-    transferNote:   r.transferNote,
-    createdAt:      r.createdAt.toISOString(),
-    user: {
-      firstName: r.user.firstName,
-      lastName:  r.user.lastName,
-      email:     r.user.email,
-    },
-    screenshot: r.documents[0]
-      ? {
-          id:       r.documents[0].id,
-          fileName: r.documents[0].fileName,
-          mimeType: r.documents[0].mimeType,
-          dataUrl:  `data:${r.documents[0].mimeType};base64,${Buffer.from(r.documents[0].fileData).toString("base64")}`,
-        }
-      : null,
+  return await Promise.all(rows.map(async (r) => {
+    let screenshotUrl = null;
+    if (r.documents[0]) {
+      screenshotUrl = await getSignedFileUrl(r.documents[0].fileKey);
+    }
+
+    return {
+      id:             r.id,
+      companyName:    r.companyName,
+      plan:           r.plan,
+      amountPaid:     r.amountPaid,
+      transferStatus: r.transferStatus,
+      transferNote:   r.transferNote,
+      createdAt:      r.createdAt.toISOString(),
+      user: {
+        firstName: r.user.firstName,
+        lastName:  r.user.lastName,
+        email:     r.user.email,
+      },
+      screenshot: r.documents[0]
+        ? {
+            id:       r.documents[0].id,
+            fileName: r.documents[0].fileName,
+            mimeType: r.documents[0].mimeType,
+            dataUrl:  screenshotUrl,
+          }
+        : null,
+    };
   }));
 }
 

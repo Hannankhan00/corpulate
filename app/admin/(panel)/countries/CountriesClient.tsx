@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useActionState } from "react";
+import { useState, useTransition, useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ReactCountryFlag from "react-country-flag";
@@ -18,9 +18,11 @@ function AddCountryForm({ onDone }: { onDone: () => void }) {
   const router = useRouter();
   const [state, action, pending] = useActionState(createServiceCountry, null);
 
-  if (state && "id" in state) {
-    router.push(`/admin/countries/${state.id}`);
-  }
+  useEffect(() => {
+    if (state && "id" in state) {
+      router.push(`/admin/countries/${state.id}`);
+    }
+  }, [state, router]);
 
   return (
     <form action={action} className="space-y-4">

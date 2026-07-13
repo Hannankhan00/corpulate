@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-
+import { uploadFile } from "@/lib/s3";
 export async function savePersonalInfo(_prev: unknown, formData: FormData) {
   const session = await getSession();
   if (!session?.userId) redirect("/");
@@ -66,10 +66,15 @@ export async function submitApplicationInfo(_prev: unknown, formData: FormData) 
   // Save uploaded documents
   const docNames = formData.getAll("docName") as string[];
   for (const docName of docNames) {
-    const key = `doc_${docName.replace(/\s+/g, "_")}`;
-    const file = formData.get(key) as File | null;
+    const formKey = `doc_${docName.replace(/\s+/g, "_")}`;
+    const file = formData.get(formKey) as File | null;
     if (file && file.size > 0) {
-      const fileData = Buffer.from(await file.arrayBuffer());
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      const mimeType = file.type || "application/octet-stream";
+      
+      const fileKey = `applications/${applicationId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+      await uploadFile(fileKey, fileBuffer, mimeType);
+
       // Delete any previous upload for the same doc on this application
       await prisma.applicationDocument.deleteMany({
         where: { applicationId, docName },
@@ -79,9 +84,9 @@ export async function submitApplicationInfo(_prev: unknown, formData: FormData) 
           applicationId,
           docName,
           fileName: file.name,
-          mimeType: file.type || "application/octet-stream",
+          mimeType,
           fileSize: file.size,
-          fileData,
+          fileKey,
         },
       });
     }
