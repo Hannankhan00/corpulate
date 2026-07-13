@@ -119,6 +119,38 @@ export default async function CustomerDetailPage({
             <DetailRow label="Phone" value={app.user.phone} />
             <DetailRow label="Member Since" value={memberSince} />
           </div>
+
+          {app.user.addresses && app.user.addresses.length > 0 && (
+            <div
+              className="rounded-xl p-6"
+              style={{ background: "rgba(26,26,28,0.8)", border: "1px solid rgba(255,255,255,0.07)" }}
+            >
+              <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wide">Saved Addresses</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {app.user.addresses.map((addr) => (
+                  <div key={addr.id} className="p-4 rounded-lg bg-white/5 border border-white/10 relative">
+                    {addr.isDefault && (
+                      <span className="absolute top-3 right-3 text-[10px] text-[#06B6D4] uppercase font-bold tracking-wider">
+                        Default
+                      </span>
+                    )}
+                    <p className="font-semibold text-sm text-white mb-1 flex items-center gap-2">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#06B6D4]">
+                        <path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      {addr.label}
+                    </p>
+                    <p className="text-xs text-white/60">{addr.streetAddress}</p>
+                    <p className="text-xs text-white/60">
+                      {addr.city}, {addr.province} {addr.postalCode}
+                    </p>
+                    <p className="text-xs text-white/60">{addr.addressCountry}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="lg:col-span-1">

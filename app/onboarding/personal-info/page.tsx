@@ -101,6 +101,7 @@ export default async function PersonalInfoPage({
       province:       true,
       postalCode:     true,
       addressCountry: true,
+      addresses:      true,
     },
   });
 

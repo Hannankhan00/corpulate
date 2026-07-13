@@ -26,6 +26,15 @@ type Props = {
     province: string | null;
     postalCode: string | null;
     addressCountry: string | null;
+    addresses: {
+      id: string;
+      label: string;
+      streetAddress: string;
+      city: string;
+      province: string;
+      postalCode: string;
+      addressCountry: string;
+    }[];
   };
 };
 
@@ -37,6 +46,25 @@ export default function PersonalInfoForm({ country, user }: Props) {
   const [dialCode, setDialCode] = useState("+92");
   const [isoCode,  setIsoCode]  = useState("PK");
   const [showDrop, setShowDrop] = useState(false);
+
+  const [streetAddress, setStreetAddress] = useState(user.streetAddress ?? "");
+  const [city, setCity] = useState(user.city ?? "");
+  const [province, setProvince] = useState(user.province ?? "");
+  const [postalCode, setPostalCode] = useState(user.postalCode ?? "");
+  const [addressCountry, setAddressCountry] = useState(user.addressCountry ?? "");
+
+  const handleSelectAddress = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    if (!id) return;
+    const addr = user.addresses.find((a) => a.id === id);
+    if (addr) {
+      setStreetAddress(addr.streetAddress);
+      setCity(addr.city);
+      setProvince(addr.province);
+      setPostalCode(addr.postalCode);
+      setAddressCountry(addr.addressCountry);
+    }
+  };
 
   const [, action, pending] = useActionState(savePersonalInfo, null);
 
@@ -120,13 +148,29 @@ export default function PersonalInfoForm({ country, user }: Props) {
 
         {/* Address */}
         <div>
-          <p className="text-xs text-white/50 uppercase tracking-wide mb-3">Residential Address</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-white/50 uppercase tracking-wide">Residential Address</p>
+            {user.addresses && user.addresses.length > 0 && (
+              <select
+                onChange={handleSelectAddress}
+                className="bg-[#1a1a1c] border border-white/20 text-white text-xs rounded-md px-2 py-1 focus:outline-none focus:border-white/50"
+              >
+                <option value="">Use saved address...</option>
+                {user.addresses.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.label} ({a.city})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
           <div className="space-y-3">
             <div>
               <label htmlFor="streetAddress" className="block text-xs text-white/35 mb-1.5">Street Address</label>
               <input
                 id="streetAddress" name="streetAddress" type="text"
-                defaultValue={user.streetAddress ?? ""}
+                value={streetAddress}
+                onChange={(e) => setStreetAddress(e.target.value)}
                 placeholder="e.g. 123 Main Street, Apt 4B"
                 className={inputClass()}
               />
@@ -134,21 +178,21 @@ export default function PersonalInfoForm({ country, user }: Props) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="city" className="block text-xs text-white/35 mb-1.5">City</label>
-                <input id="city" name="city" type="text" defaultValue={user.city ?? ""} placeholder="e.g. London" className={inputClass()} />
+                <input id="city" name="city" type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. London" className={inputClass()} />
               </div>
               <div>
                 <label htmlFor="province" className="block text-xs text-white/35 mb-1.5">State / Province</label>
-                <input id="province" name="province" type="text" defaultValue={user.province ?? ""} placeholder="e.g. Ontario" className={inputClass()} />
+                <input id="province" name="province" type="text" value={province} onChange={(e) => setProvince(e.target.value)} placeholder="e.g. Ontario" className={inputClass()} />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="postalCode" className="block text-xs text-white/35 mb-1.5">Postal / ZIP Code</label>
-                <input id="postalCode" name="postalCode" type="text" defaultValue={user.postalCode ?? ""} placeholder="e.g. SW1A 1AA" className={inputClass()} />
+                <input id="postalCode" name="postalCode" type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="e.g. SW1A 1AA" className={inputClass()} />
               </div>
               <div>
                 <label htmlFor="addressCountry" className="block text-xs text-white/35 mb-1.5">Country</label>
-                <input id="addressCountry" name="addressCountry" type="text" defaultValue={user.addressCountry ?? ""} placeholder="e.g. United Kingdom" className={inputClass()} />
+                <input id="addressCountry" name="addressCountry" type="text" value={addressCountry} onChange={(e) => setAddressCountry(e.target.value)} placeholder="e.g. United Kingdom" className={inputClass()} />
               </div>
             </div>
           </div>

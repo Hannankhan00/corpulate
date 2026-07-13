@@ -126,7 +126,7 @@ const NAV_ITEMS: NavItem[] = [
     ],
   },
   { id: "tax", label: "Tax Management", icon: <TaxIcon /> },
-  { id: "addresses", label: "My Addresses", icon: <AddressIcon /> },
+  { id: "addresses", label: "My Addresses", icon: <AddressIcon />, href: "/dashboard/my-addresses" },
   { id: "trademark", label: "Trademark", icon: <TrademarkIcon /> },
   {
     id: "banking", label: "Banking and Payments", icon: <BankingIcon />,

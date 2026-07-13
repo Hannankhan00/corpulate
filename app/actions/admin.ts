@@ -50,6 +50,7 @@ export async function getAdminApplication(id: string) {
           email: true,
           phone: true,
           createdAt: true,
+          addresses: true,
         },
       },
     },
