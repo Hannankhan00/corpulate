@@ -207,7 +207,7 @@ function StripePayForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <PaymentElement options={{ layout: "tabs" }} />
+      <PaymentElement options={{ layout: "tabs", paymentMethodOrder: ["card"] }} />
       {error && (
         <div className="flex items-start gap-2.5 px-4 py-3 rounded-[10px]" style={{ background: "rgba(255,91,98,0.10)", border: "1px solid rgba(255,91,98,0.25)" }}>
           <svg viewBox="0 0 24 24" fill="none" stroke="#FF5B62" strokeWidth={2} className="w-4 h-4 shrink-0 mt-0.5">
