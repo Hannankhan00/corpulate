@@ -112,7 +112,7 @@ export default function SignupPage() {
       >
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <Image src="/assets/logo.png" alt="Corpulate" width={140} height={44} priority style={{ width: "auto", height: "auto" }} />
+          <Image src="/assets/logo.png" alt="Corpulate" width={140} height={44} priority style={{ width: 140, height: "auto" }} />
         </div>
 
         <h1 className="text-center text-2xl font-bold text-white tracking-widest uppercase mb-7">

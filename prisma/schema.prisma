@@ -60,6 +60,7 @@ model User {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   applications Application[]
+  documents    UserDocument[]
 
   @@index([provider, providerId])
 }
@@ -211,4 +212,18 @@ model ServiceCompanyType {
   createdAt   DateTime       @default(now())
 
   @@unique([countryId, slug])
+}
+
+model UserDocument {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  fileName    String
+  mimeType    String
+  fileSize    Int
+  fileKey     String
+  source      String   @default("user") // "corpulate" or "user"
+  status      String   @default("Available")
+  uploadedAt  DateTime @default(now())
 }

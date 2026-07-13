@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useTransition } from "react";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
+import { uploadUserDocument, deleteUserDocument, getDocumentDownloadUrl } from "@/app/actions/userDocuments";
 
 // ── Shared Styling Constants ─────────────────────────────────────
 const PAGE_BG =
@@ -41,54 +42,54 @@ const TrashIcon = () => (
   </svg>
 );
 
-// ── Mock Data ──────────────────────────────────────────────────
-const DOCUMENTS = [
-  { id: "doc_1", name: "Articles of Incorporation", date: "Oct 12, 2025", size: "1.2 MB", status: "Available", source: "corpulate" },
-  { id: "doc_2", name: "Employer Identification Number (EIN) Letter", date: "Oct 15, 2025", size: "850 KB", status: "Available", source: "corpulate" },
-  { id: "doc_3", name: "Operating Agreement", date: "Oct 15, 2025", size: "2.4 MB", status: "Available", source: "corpulate" },
-  { id: "doc_4", name: "Certificate of Good Standing", date: "-", size: "-", status: "Pending", source: "corpulate" },
-  { id: "doc_5", name: "Registered Agent Notice", date: "Oct 16, 2025", size: "450 KB", status: "Available", source: "corpulate" },
-];
+type Doc = {
+  id: string;
+  name: string;
+  date: string;
+  size: string;
+  status: string;
+  source: "corpulate" | "user";
+};
 
-export default function MyDocsClient({ user }: { user: { firstName: string } }) {
+export default function MyDocsClient({ user, initialDocuments }: { user: { firstName: string }; initialDocuments: Doc[] }) {
   const [activeTab, setActiveTab] = React.useState<"corpulate" | "user">("corpulate");
-  const [userDocuments, setUserDocuments] = React.useState<typeof DOCUMENTS>([
-    { id: "user_doc_1", name: "Utility Bill (Proof of Address)", date: "Oct 20, 2025", size: "1.8 MB", status: "Available", source: "user" },
-    { id: "user_doc_2", name: "Passport Copy (Officer 1)", date: "Oct 22, 2025", size: "2.1 MB", status: "Available", source: "user" },
-  ]);
-  const [isUploading, setIsUploading] = React.useState(false);
+  const [isPending, startTransition] = useTransition();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
-
-    // Simulate file upload delay
-    setTimeout(() => {
-      const newDoc = {
-        id: `user_doc_${Date.now()}`,
-        name: file.name,
-        date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-        size: file.size > 1024 * 1024 
-          ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
-          : `${(file.size / 1024).toFixed(0)} KB`,
-        status: "Available" as const,
-        source: "user" as const,
-      };
-
-      setUserDocuments((prev) => [newDoc, ...prev]);
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }, 1500);
+    startTransition(async () => {
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        await uploadUserDocument(formData);
+      } catch (err) {
+        console.error("Upload failed", err);
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    });
   };
 
   const handleDelete = (id: string) => {
-    setUserDocuments((prev) => prev.filter((doc) => doc.id !== id));
+    if (!confirm("Are you sure you want to delete this document?")) return;
+    startTransition(async () => {
+      await deleteUserDocument(id);
+    });
   };
 
-  const currentDocuments = activeTab === "corpulate" ? DOCUMENTS : userDocuments;
+  const handleDownload = async (id: string) => {
+    try {
+      const url = await getDocumentDownloadUrl(id);
+      window.open(url, "_blank");
+    } catch (err) {
+      console.error("Download failed", err);
+    }
+  };
+
+  const currentDocuments = initialDocuments.filter(d => d.source === activeTab);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: PAGE_BG }}>
@@ -154,13 +155,13 @@ export default function MyDocsClient({ user }: { user: { firstName: string } }) 
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
+                    disabled={isPending}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
                     style={{
                       background: "linear-gradient(90deg, #9452E8 12.5%, #FF5B62 91.3%)",
                     }}
                   >
-                    {isUploading ? (
+                    {isPending ? (
                       <>
                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -237,6 +238,7 @@ export default function MyDocsClient({ user }: { user: { firstName: string } }) 
                             {doc.status === "Available" ? (
                               <button 
                                 type="button"
+                                onClick={() => handleDownload(doc.id)}
                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white hover:text-white transition-colors cursor-pointer"
                                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
                               >
@@ -251,7 +253,8 @@ export default function MyDocsClient({ user }: { user: { firstName: string } }) 
                               <button 
                                 type="button"
                                 onClick={() => handleDelete(doc.id)}
-                                className="inline-flex items-center justify-center p-2 rounded-lg text-white/40 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                                disabled={isPending}
+                                className="inline-flex items-center justify-center p-2 rounded-lg text-white/40 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer disabled:opacity-50"
                                 title="Delete document"
                               >
                                 <TrashIcon />

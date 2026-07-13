@@ -13,5 +13,22 @@ export default async function MyDocumentsPage() {
 
   if (!user) redirect("/");
 
-  return <MyDocsClient user={{ firstName: user.firstName }} />;
+  const docs = await prisma.userDocument.findMany({
+    where: { userId: session.userId },
+    orderBy: { uploadedAt: "desc" },
+  });
+
+  const formattedDocs = docs.map((d) => ({
+    id: d.id,
+    name: d.name,
+    date: d.uploadedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    size:
+      d.fileSize > 1024 * 1024
+        ? `${(d.fileSize / (1024 * 1024)).toFixed(1)} MB`
+        : `${(d.fileSize / 1024).toFixed(0)} KB`,
+    status: d.status,
+    source: d.source as "corpulate" | "user",
+  }));
+
+  return <MyDocsClient user={{ firstName: user.firstName }} initialDocuments={formattedDocs} />;
 }

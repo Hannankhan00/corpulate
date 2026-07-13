@@ -230,7 +230,7 @@ export default function AdminSidebar({
             width={130}
             height={40}
             priority
-            style={{ width: "auto", height: "auto" }}
+            style={{ width: 130, height: "auto" }}
           />
         </div>
 

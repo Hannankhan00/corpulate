@@ -81,7 +81,7 @@ export default function LoginPage() {
 
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full p-12">
-          <Image src="/assets/logo.png" alt="Corpulate" width={140} height={44} priority style={{ width: "auto", height: "auto" }} />
+          <Image src="/assets/logo.png" alt="Corpulate" width={140} height={44} priority style={{ width: 140, height: "auto" }} />
 
           <div className="flex-1 flex flex-col justify-center">
             <p className="text-xs font-bold tracking-[0.2em] uppercase text-brand-cyan mb-5">
@@ -156,7 +156,7 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 lg:px-12">
         {/* Mobile-only logo */}
         <div className="lg:hidden mb-8">
-          <Image src="/assets/logo.png" alt="Corpulate" width={120} height={38} priority style={{ width: "auto", height: "auto" }} />
+          <Image src="/assets/logo.png" alt="Corpulate" width={120} height={38} priority style={{ width: 120, height: "auto" }} />
         </div>
 
         <div className="w-full max-w-100">
