@@ -58,7 +58,7 @@ export default function MyAddressesClient({ user, addresses }: { user: { firstNa
           subtitle="Manage your saved addresses for company registration and shipping." 
         />
 
-        <div className="w-full mt-6 flex flex-col gap-6 max-w-4xl">
+        <div className="w-full mt-6 flex flex-col gap-6">
           <div className="rounded-[15px] p-6" style={CARD_STYLE}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
               <div>
@@ -137,9 +137,9 @@ export default function MyAddressesClient({ user, addresses }: { user: { firstNa
               </form>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               {addresses.length === 0 && !showAddForm ? (
-                <div className="col-span-2 py-12 text-center text-white/40">
+                <div className="py-12 text-center text-white/40">
                   <p>You have no saved addresses yet.</p>
                 </div>
               ) : (
