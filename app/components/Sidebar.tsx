@@ -57,6 +57,14 @@ const HubIcon = () => (
   </svg>
 );
 
+const ServicesIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+    <line x1="12" y1="22.08" x2="12" y2="12" />
+  </svg>
+);
+
 const CampaignsIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
     <path d="M8 21h8M12 17v4M7 4h10l2 7H5L7 4z" /><path d="M12 11V4" />
@@ -107,8 +115,8 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: "my-company", label: "My Company", icon: <CompanyIcon />,
     children: [
-      { id: "my-documents", label: "My Documents" },
-      { id: "my-information", label: "My Information" },
+      { id: "my-documents", label: "My Documents", href: "/dashboard/my-documents" },
+      { id: "my-information", label: "My Information", href: "/dashboard/my-information" },
     ],
   },
   {
@@ -129,6 +137,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   { id: "hub", label: "Hub", icon: <HubIcon /> },
   { id: "campaigns", label: "Campaigns", icon: <CampaignsIcon /> },
+  { id: "services", label: "Services", icon: <ServicesIcon />, href: "/dashboard/services" },
   { id: "settings", label: "Settings", icon: <SettingsIcon /> },
 ];
 

@@ -515,6 +515,7 @@ async function seedPlans() {
   const plans: {
     slug: string; name: string; monthlyPrice: number; annualDiscountPct: number;
     description: string; features: string[]; isHighlight: boolean; sortOrder: number;
+    isSubscription: boolean;
   }[] = [
     {
       slug: "starter",
@@ -531,6 +532,7 @@ async function seedPlans() {
       ],
       isHighlight: false,
       sortOrder: 1,
+      isSubscription: true,
     },
     {
       slug: "professional",
@@ -548,6 +550,7 @@ async function seedPlans() {
       ],
       isHighlight: true,
       sortOrder: 2,
+      isSubscription: true,
     },
     {
       slug: "enterprise",
@@ -565,13 +568,81 @@ async function seedPlans() {
       ],
       isHighlight: false,
       sortOrder: 3,
+      isSubscription: true,
+    },
+    {
+      slug: "website-development",
+      name: "Website Development",
+      monthlyPrice: 499,
+      annualDiscountPct: 0,
+      description: "Custom website development for your brand.",
+      features: [
+        "Modern responsive design",
+        "Next.js or WordPress setup",
+        "SEO optimization",
+        "Contact form & database setup",
+        "1 month free maintenance",
+      ],
+      isHighlight: false,
+      sortOrder: 4,
+      isSubscription: false,
+    },
+    {
+      slug: "itin-filing",
+      name: "ITIN Filing",
+      monthlyPrice: 150,
+      annualDiscountPct: 0,
+      description: "Individual Taxpayer Identification Number filing.",
+      features: [
+        "Form W-7 preparation",
+        "Certified acceptance agent service",
+        "IRS submission and tracking",
+        "Support with IRS queries",
+      ],
+      isHighlight: false,
+      sortOrder: 5,
+      isSubscription: false,
+    },
+    {
+      slug: "ein-filing",
+      name: "EIN Filing",
+      monthlyPrice: 99,
+      annualDiscountPct: 0,
+      description: "Employer Identification Number for non-residents.",
+      features: [
+        "Form SS-4 filing",
+        "No SSN required for filing",
+        "IRS submission and verification",
+        "Official confirmation document",
+      ],
+      isHighlight: false,
+      sortOrder: 6,
+      isSubscription: false,
+    },
+    {
+      slug: "trademark-registration",
+      name: "Trademark Registration",
+      monthlyPrice: 299,
+      annualDiscountPct: 0,
+      description: "Protect your brand name or logo.",
+      features: [
+        "Comprehensive trademark search",
+        "USPTO filing & preparation",
+        "Official application status reports",
+        "Attorney review",
+      ],
+      isHighlight: false,
+      sortOrder: 7,
+      isSubscription: false,
     },
   ];
 
   for (const p of plans) {
     await prisma.servicePlan.upsert({
       where: { slug: p.slug },
-      update: {},
+      update: {
+        isSubscription: p.isSubscription,
+      },
       create: {
         slug: p.slug,
         name: p.name,
@@ -581,6 +652,7 @@ async function seedPlans() {
         features: JSON.stringify(p.features),
         isHighlight: p.isHighlight,
         sortOrder: p.sortOrder,
+        isSubscription: p.isSubscription,
       },
     });
   }

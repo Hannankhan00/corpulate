@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import ReactCountryFlag from "react-country-flag";
 import Sidebar from "@/app/components/Sidebar";
+import Header from "@/app/components/Header";
 import PostPaymentModal from "./PostPaymentModal";
 import { simulatePayment } from "@/app/actions/application";
 import type { AppSummary, PendingInfoData } from "./page";
@@ -248,25 +249,7 @@ export default function DashboardClient({
 
       <main className="flex-1 overflow-y-auto p-4 md:p-6">
         {/* Welcome bar */}
-        <div className="flex items-center gap-3 md:gap-4 rounded-[50px] pl-12 pr-4 md:px-5 py-4 mb-4" style={{ background: "#1a1a1c", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.3)" }}>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ background: "linear-gradient(135deg,#7C3AED,#06B6D4)" }}>
-            {firstName.charAt(0).toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-fg text-sm">Welcome, {firstName}</p>
-            <p className="text-xs text-fg-muted mt-0.5 leading-relaxed">
-              Choose the country you want to incorporate in and the services you want to receive.
-            </p>
-          </div>
-          <div className="flex gap-2 shrink-0">
-            <button type="button" aria-label="Notifications" className="w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors duration-150 cursor-pointer border border-white" style={{ background: "#1a1a1c" }}>
-              <BellIcon />
-            </button>
-            <button type="button" aria-label="Sign out" className="w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-colors duration-150 cursor-pointer border border-white" style={{ background: "#1a1a1c" }}>
-              <PowerIcon />
-            </button>
-          </div>
-        </div>
+        <Header firstName={firstName} />
 
         {/* Info banner */}
         <div className="flex flex-wrap items-center gap-3 rounded-[15px] px-4 md:px-5 py-4 mb-6" style={{ background: "rgba(83,83,83,0.49)", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.5)" }}>
@@ -330,7 +313,12 @@ export default function DashboardClient({
               <p className="text-sm leading-relaxed mb-5" style={{ color: "#B4B4D4" }}>
                 Access bookkeeping, tax management, business banking, registered address, and trademark services for your existing {shortName} company, all from one dashboard.
               </p>
-              <button type="button" className="self-start px-6 py-2.5 rounded-full text-sm font-semibold cursor-pointer text-white border border-[#9f4dbc]" style={{ background: "linear-gradient(90deg, #9452E8 12.5%, #C64CD3 29.3%, #E945A8 45.7%, #FF4AB3 61%, #FF5480 76%, #FF5B62 91.3%)" }}>
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard/services")}
+                className="self-start px-6 py-2.5 rounded-full text-sm font-semibold cursor-pointer text-white border border-[#9f4dbc] hover:opacity-90 active:scale-[0.98] transition-all"
+                style={{ background: "linear-gradient(90deg, #9452E8 12.5%, #C64CD3 29.3%, #E945A8 45.7%, #FF4AB3 61%, #FF5480 76%, #FF5B62 91.3%)" }}
+              >
                 Buy Service
               </button>
             </div>

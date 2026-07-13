@@ -14,6 +14,7 @@ type Plan = {
   isHighlight: boolean;
   isActive: boolean;
   sortOrder: number;
+  isSubscription: boolean;
 };
 
 const inputCls = "w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40";
@@ -37,31 +38,40 @@ function PlanForm({
   error?: string;
   isNew: boolean;
 }) {
+  const isSubscription = true;
+
   return (
     <form action={action} className="space-y-4">
       {plan && <input type="hidden" name="id" value={plan.id} />}
+      <input type="hidden" name="isSubscription" value="true" />
       {error && <p className="text-red-400 text-xs">{error}</p>}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {isNew && (
           <div>
             <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Slug</label>
-            <input name="slug" placeholder="e.g. starter" required className={inputCls} />
+            <input name="slug" placeholder="e.g. website-dev" required className={inputCls} />
             <p className="text-[10px] text-white/25 mt-1">Lowercase, no spaces</p>
           </div>
         )}
         <div className={isNew ? "" : "col-span-2"}>
-          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Plan Name</label>
-          <input name="name" defaultValue={plan?.name} placeholder="e.g. Starter" required className={inputCls} />
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Plan/Service Name</label>
+          <input name="name" defaultValue={plan?.name} placeholder="e.g. Website Development" required className={inputCls} />
         </div>
         <div>
-          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Monthly Price ($)</label>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">
+            {isSubscription ? "Monthly Price ($)" : "One-time Price ($)"}
+          </label>
           <input name="monthlyPrice" type="number" min={0} defaultValue={plan?.monthlyPrice ?? 49} required className={inputCls} />
         </div>
-        <div>
-          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Annual Discount (%)</label>
-          <input name="annualDiscountPct" type="number" min={0} max={100} defaultValue={plan?.annualDiscountPct ?? 20} className={inputCls} />
-        </div>
+        
+        {isSubscription && (
+          <div>
+            <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Annual Discount (%)</label>
+            <input name="annualDiscountPct" type="number" min={0} max={100} defaultValue={plan?.annualDiscountPct ?? 20} className={inputCls} />
+          </div>
+        )}
+        
         <div>
           <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Sort Order</label>
           <input name="sortOrder" type="number" defaultValue={plan?.sortOrder ?? 0} className={inputCls} />
@@ -79,15 +89,17 @@ function PlanForm({
           name="features"
           rows={6}
           defaultValue={plan ? featuresToText(plan.features) : ""}
-          placeholder={"Company registration\nRegistered agent (1 year)\nEIN / Tax ID application"}
+          placeholder={"Modern responsive design\nSEO optimization\n1 month free maintenance"}
           className="w-full rounded-lg bg-[#111] border border-white/15 px-3 py-2 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40 resize-none"
         />
       </div>
 
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" name="isHighlight" value="true" defaultChecked={plan?.isHighlight} className="accent-violet-500 w-4 h-4" />
-        <span className="text-sm text-white/60">Mark as &quot;Most Popular&quot;</span>
-      </label>
+      <div className="flex flex-wrap gap-6 pt-1">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <input type="checkbox" name="isHighlight" value="true" defaultChecked={plan?.isHighlight} className="accent-violet-500 w-4 h-4" />
+          <span className="text-sm text-white/60 font-medium">Mark as &quot;Most Popular&quot;</span>
+        </label>
+      </div>
 
       <div className="flex gap-2 justify-end pt-1">
         <button type="button" onClick={onDone} className="px-4 py-2 rounded-lg text-sm text-white/50 hover:text-white cursor-pointer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}>
@@ -151,9 +163,22 @@ function PlanCard({ plan }: { plan: Plan }) {
       {/* Header */}
       <div className="flex items-start justify-between px-5 pt-5 pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
             <span className="text-xs font-black text-white/25">{plan.slug}</span>
             <span className="font-bold text-white">{plan.name}</span>
+            
+            {/* Type badge */}
+            <span
+              className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full"
+              style={{
+                background: plan.isSubscription ? "rgba(139, 92, 246, 0.15)" : "rgba(6, 182, 212, 0.15)",
+                color: plan.isSubscription ? "#C4B5FD" : "#22D3EE",
+                border: plan.isSubscription ? "1px solid rgba(139, 92, 246, 0.25)" : "1px solid rgba(6, 182, 212, 0.25)",
+              }}
+            >
+              {plan.isSubscription ? "Subscription" : "One-Time"}
+            </span>
+
             {plan.isHighlight && (
               <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)", color: "white" }}>Most Popular</span>
             )}
@@ -161,14 +186,20 @@ function PlanCard({ plan }: { plan: Plan }) {
               <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>Hidden</span>
             )}
           </div>
+          
           <div className="flex items-baseline gap-3">
-            <span className="text-2xl font-bold text-white">${plan.monthlyPrice}<span className="text-sm font-normal text-white/40">/mo</span></span>
-            {plan.annualDiscountPct > 0 && (
+            <span className="text-2xl font-bold text-white">
+              ${plan.monthlyPrice}
+              {plan.isSubscription && <span className="text-sm font-normal text-white/40">/mo</span>}
+              {!plan.isSubscription && <span className="text-xs font-normal text-white/40 ml-1">(flat fee)</span>}
+            </span>
+            {plan.isSubscription && plan.annualDiscountPct > 0 && (
               <span className="text-sm text-white/50">${annualPrice}/mo annual <span className="text-[11px] font-bold" style={{ color: "#10B981" }}>(-{plan.annualDiscountPct}%)</span></span>
             )}
           </div>
           {plan.description && <p className="text-xs text-white/40 mt-1">{plan.description}</p>}
         </div>
+        
         <div className="flex items-center gap-1.5 shrink-0 ml-4">
           <button type="button" onClick={() => setEditing(!editing)} className="px-2.5 py-1.5 rounded-lg text-xs text-white/50 hover:text-white cursor-pointer" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)" }}>
             {editing ? "Cancel" : "Edit"}
@@ -217,15 +248,15 @@ function PlanCard({ plan }: { plan: Plan }) {
   );
 }
 
-export default function PlansClient({ plans }: { plans: Plan[] }) {
+export default function PlansClient({ plans = [] }: { plans: Plan[] }) {
   const [adding, setAdding] = useState(false);
 
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 md:mb-8 pl-10 md:pl-0">
         <div>
-          <h1 className="text-2xl font-bold text-white">Plans</h1>
-          <p className="text-sm text-white/45 mt-1">Set pricing, features, and visibility for each onboarding plan.</p>
+          <h1 className="text-2xl font-bold text-white">Company Registration Plans</h1>
+          <p className="text-sm text-white/45 mt-1">Configure recurring company onboarding plans (subscriptions).</p>
         </div>
         {!adding && (
           <button type="button" onClick={() => setAdding(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white cursor-pointer" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}>
@@ -237,7 +268,7 @@ export default function PlansClient({ plans }: { plans: Plan[] }) {
 
       {adding && (
         <div className="rounded-xl p-5 mb-6" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)" }}>
-          <p className="text-sm font-semibold text-white mb-4">New Plan</p>
+          <p className="text-sm font-semibold text-white mb-4">New Plan / Service</p>
           <AddPlanForm onDone={() => setAdding(false)} />
         </div>
       )}

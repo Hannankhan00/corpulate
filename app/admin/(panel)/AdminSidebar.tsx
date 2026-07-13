@@ -64,10 +64,17 @@ const TeamIcon = () => (
   </svg>
 );
 
-const ServicesIcon = () => (
+const CountriesIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
     <circle cx="12" cy="12" r="10" />
     <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
+  </svg>
+);
+
+const ServicesIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={18} height={18}>
+    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
   </svg>
 );
 
@@ -106,6 +113,10 @@ const NAV_BASE = [
 
 const NAV_TEAM = {
   id: "team", label: "Team", href: "/admin/team", icon: <TeamIcon />,
+};
+
+const NAV_COUNTRIES = {
+  id: "countries", label: "Countries", href: "/admin/countries", icon: <CountriesIcon />,
 };
 
 const NAV_SERVICES = {
@@ -162,7 +173,7 @@ export default function AdminSidebar({
   const navItems =
     role === "SUPPORT"
       ? [...NAV_BASE, NAV_PAYMENTS, NAV_TRANSFERS]
-      : [...NAV_BASE, NAV_SERVICES, NAV_PLANS, NAV_PROMO, NAV_PAYMENTS, NAV_TRANSFERS, NAV_BANK_SETTINGS, NAV_TEAM];
+      : [...NAV_BASE, NAV_COUNTRIES, NAV_PLANS, NAV_SERVICES, NAV_PROMO, NAV_PAYMENTS, NAV_TRANSFERS, NAV_BANK_SETTINGS, NAV_TEAM];
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
@@ -219,7 +230,7 @@ export default function AdminSidebar({
             width={130}
             height={40}
             priority
-            style={{ height: "auto" }}
+            style={{ width: "auto", height: "auto" }}
           />
         </div>
 

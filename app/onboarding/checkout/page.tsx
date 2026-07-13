@@ -36,7 +36,9 @@ export default async function CheckoutPage({
   ]);
   if (!planRecord) redirect("/onboarding/plan-selection");
 
-  const planPrice = billing === "annual"
+  const isSubscription = planRecord.isSubscription;
+
+  const planPrice = (isSubscription && billing === "annual")
     ? Math.round(planRecord.monthlyPrice * 12 * (1 - planRecord.annualDiscountPct / 100))
     : planRecord.monthlyPrice;
 
@@ -70,6 +72,7 @@ export default async function CheckoutPage({
       total={total}
       addons={addons}
       bankDetails={bankDetails}
+      isSubscription={isSubscription}
     />
   );
 }

@@ -1,200 +1,283 @@
 "use client";
 
 import { useState, useTransition, useActionState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import ReactCountryFlag from "react-country-flag";
-import { createServiceCountry, toggleServiceCountry, deleteServiceCountry } from "@/app/actions/admin-services";
+import { addPlan, updatePlan, togglePlan, deletePlan } from "@/app/actions/admin-services";
 
-type Country = {
+type Plan = {
   id: string;
+  slug: string;
   name: string;
-  isoCode: string;
+  monthlyPrice: number;
+  annualDiscountPct: number;
+  description: string | null;
+  features: string;
+  isHighlight: boolean;
   isActive: boolean;
-  _count: { states: number; documents: number; fields: number };
+  sortOrder: number;
+  isSubscription: boolean;
 };
 
-function AddCountryForm({ onDone }: { onDone: () => void }) {
-  const router = useRouter();
-  const [state, action, pending] = useActionState(createServiceCountry, null);
+const inputCls = "w-full h-9 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40";
 
-  if (state && "id" in state) {
-    router.push(`/admin/services/${state.id}`);
-  }
+function featuresToText(json: string): string {
+  try { return (JSON.parse(json) as string[]).join("\n"); } catch { return ""; }
+}
+
+function ServiceForm({
+  plan,
+  onDone,
+  action,
+  pending,
+  error,
+  isNew,
+}: {
+  plan?: Plan;
+  onDone: () => void;
+  action: (payload: FormData) => void;
+  pending: boolean;
+  error?: string;
+  isNew: boolean;
+}) {
+  const isSubscription = false;
 
   return (
     <form action={action} className="space-y-4">
-      {state && "error" in state && (
-        <p className="text-red-400 text-xs">{state.error}</p>
-      )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-xs text-white/50 mb-1.5 uppercase tracking-wide">Country Name</label>
-          <input
-            name="name"
-            placeholder="e.g. United States"
-            required
-            className="w-full h-10 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40 transition-colors"
-          />
+      {plan && <input type="hidden" name="id" value={plan.id} />}
+      <input type="hidden" name="isSubscription" value="false" />
+      {error && <p className="text-red-400 text-xs">{error}</p>}
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {isNew && (
+          <div>
+            <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Slug</label>
+            <input name="slug" placeholder="e.g. website-dev" required className={inputCls} />
+            <p className="text-[10px] text-white/25 mt-1">Lowercase, no spaces</p>
+          </div>
+        )}
+        <div className={isNew ? "" : "col-span-2"}>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Service Name</label>
+          <input name="name" defaultValue={plan?.name} placeholder="e.g. Website Development" required className={inputCls} />
         </div>
         <div>
-          <label className="block text-xs text-white/50 mb-1.5 uppercase tracking-wide">ISO Code (2 letters)</label>
-          <input
-            name="isoCode"
-            placeholder="e.g. US"
-            maxLength={2}
-            required
-            className="w-full h-10 rounded-lg bg-[#111] border border-white/15 px-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40 transition-colors"
-            style={{ textTransform: "uppercase" }}
-          />
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">
+            One-time Price ($)
+          </label>
+          <input name="monthlyPrice" type="number" min={0} defaultValue={plan?.monthlyPrice ?? 49} required className={inputCls} />
+        </div>
+        
+        {isSubscription && (
+          <div>
+            <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Annual Discount (%)</label>
+            <input name="annualDiscountPct" type="number" min={0} max={100} defaultValue={plan?.annualDiscountPct ?? 20} className={inputCls} />
+          </div>
+        )}
+        
+        <div>
+          <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Sort Order</label>
+          <input name="sortOrder" type="number" defaultValue={plan?.sortOrder ?? 0} className={inputCls} />
         </div>
       </div>
-      <div className="flex gap-2 justify-end">
-        <button
-          type="button"
-          onClick={onDone}
-          className="px-4 py-2 rounded-lg text-sm text-white/50 hover:text-white transition-colors cursor-pointer"
-          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
-        >
+
+      <div>
+        <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Description</label>
+        <input name="description" defaultValue={plan?.description ?? ""} placeholder="Short tagline shown under the plan name" className={inputCls} />
+      </div>
+
+      <div>
+        <label className="block text-xs text-white/45 mb-1 uppercase tracking-wide">Features <span className="normal-case text-white/25">(one per line)</span></label>
+        <textarea
+          name="features"
+          rows={6}
+          defaultValue={plan ? featuresToText(plan.features) : ""}
+          placeholder={"Modern responsive design\nSEO optimization\n1 month free maintenance"}
+          className="w-full rounded-lg bg-[#111] border border-white/15 px-3 py-2 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-white/40 resize-none"
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-6 pt-1">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <input type="checkbox" name="isHighlight" value="true" defaultChecked={plan?.isHighlight} className="accent-violet-500 w-4 h-4" />
+          <span className="text-sm text-white/60 font-medium">Mark as &quot;Most Popular&quot;</span>
+        </label>
+      </div>
+
+      <div className="flex gap-2 justify-end pt-1">
+        <button type="button" onClick={onDone} className="px-4 py-2 rounded-lg text-sm text-white/50 hover:text-white cursor-pointer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}>
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={pending}
-          className="px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer disabled:opacity-50"
-          style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}
-        >
-          {pending ? "Adding…" : "Add Country"}
+        <button type="submit" disabled={pending} className="px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer disabled:opacity-50" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}>
+          {pending ? "Saving…" : isNew ? "Add Service" : "Save Changes"}
         </button>
       </div>
     </form>
   );
 }
 
-function ToggleBtn({ country }: { country: Country }) {
-  const [pending, start] = useTransition();
+function AddServiceForm({ onDone }: { onDone: () => void }) {
+  const [state, action, pending] = useActionState(addPlan, null);
+  if (state && "ok" in state) onDone();
+
   return (
-    <button
-      type="button"
-      disabled={pending}
-      onClick={() => start(async () => { await toggleServiceCountry(country.id, !country.isActive); })}
-      className="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50"
+    <ServiceForm
+      onDone={onDone}
+      action={action}
+      pending={pending}
+      error={state && "error" in state ? state.error : undefined}
+      isNew
+    />
+  );
+}
+
+function EditServiceForm({ plan, onDone }: { plan: Plan; onDone: () => void }) {
+  const [state, action, pending] = useActionState(updatePlan, null);
+  if (state && "ok" in state) onDone();
+
+  return (
+    <ServiceForm
+      plan={plan}
+      onDone={onDone}
+      action={action}
+      pending={pending}
+      error={state && "error" in state ? String(state.error) : undefined}
+      isNew={false}
+    />
+  );
+}
+
+function ServiceCard({ plan }: { plan: Plan }) {
+  const [editing, setEditing] = useState(false);
+  const [togPending, startTog] = useTransition();
+  const [delPending, startDel] = useTransition();
+
+  const features: string[] = (() => { try { return JSON.parse(plan.features); } catch { return []; } })();
+  const annualPrice = Math.round(plan.monthlyPrice * (1 - plan.annualDiscountPct / 100));
+
+  return (
+    <div
+      className="rounded-xl overflow-hidden"
       style={{
-        background: "rgba(255,255,255,0.07)",
-        border: "1px solid rgba(255,255,255,0.10)",
-        color: country.isActive ? "#F87171" : "#34D399",
+        background: plan.isHighlight ? "rgba(148,82,232,0.08)" : "rgba(255,255,255,0.04)",
+        border: plan.isHighlight ? "1px solid rgba(148,82,232,0.25)" : "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      {pending ? "…" : country.isActive ? "Deactivate" : "Activate"}
-    </button>
+      {/* Header */}
+      <div className="flex items-start justify-between px-5 pt-5 pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <span className="text-xs font-black text-white/25">{plan.slug}</span>
+            <span className="font-bold text-white">{plan.name}</span>
+            
+            {/* Type badge */}
+            <span
+              className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full"
+              style={{
+                background: plan.isSubscription ? "rgba(139, 92, 246, 0.15)" : "rgba(6, 182, 212, 0.15)",
+                color: plan.isSubscription ? "#C4B5FD" : "#22D3EE",
+                border: plan.isSubscription ? "1px solid rgba(139, 92, 246, 0.25)" : "1px solid rgba(6, 182, 212, 0.25)",
+              }}
+            >
+              {plan.isSubscription ? "Subscription" : "One-Time"}
+            </span>
+
+            {plan.isHighlight && (
+              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)", color: "white" }}>Most Popular</span>
+            )}
+            {!plan.isActive && (
+              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>Hidden</span>
+            )}
+          </div>
+          
+          <div className="flex items-baseline gap-3">
+            <span className="text-2xl font-bold text-white">
+              ${plan.monthlyPrice}
+              {plan.isSubscription && <span className="text-sm font-normal text-white/40">/mo</span>}
+              {!plan.isSubscription && <span className="text-xs font-normal text-white/40 ml-1">(flat fee)</span>}
+            </span>
+            {plan.isSubscription && plan.annualDiscountPct > 0 && (
+              <span className="text-sm text-white/50">${annualPrice}/mo annual <span className="text-[11px] font-bold" style={{ color: "#10B981" }}>(-{plan.annualDiscountPct}%)</span></span>
+            )}
+          </div>
+          {plan.description && <p className="text-xs text-white/40 mt-1">{plan.description}</p>}
+        </div>
+        
+        <div className="flex items-center gap-1.5 shrink-0 ml-4">
+          <button type="button" onClick={() => setEditing(!editing)} className="px-2.5 py-1.5 rounded-lg text-xs text-white/50 hover:text-white cursor-pointer" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)" }}>
+            {editing ? "Cancel" : "Edit"}
+          </button>
+          <button
+            type="button" disabled={togPending}
+            onClick={() => startTog(async () => { await togglePlan(plan.id, !plan.isActive); })}
+            className="px-2.5 py-1.5 rounded-lg text-xs cursor-pointer disabled:opacity-50"
+            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)", color: plan.isActive ? "#F87171" : "#34D399" }}
+          >
+            {togPending ? "…" : plan.isActive ? "Hide" : "Show"}
+          </button>
+          <button
+            type="button" disabled={delPending}
+            onClick={() => {
+              if (!confirm(`Delete service "${plan.name}"?`)) return;
+              startDel(async () => { await deletePlan(plan.id); });
+            }}
+            className="px-2.5 py-1.5 rounded-lg text-xs text-red-400 hover:bg-red-500/10 cursor-pointer disabled:opacity-50"
+            style={{ border: "1px solid rgba(239,68,68,0.2)" }}
+          >
+            {delPending ? "…" : "Delete"}
+          </button>
+        </div>
+      </div>
+
+      {/* Features list (collapsed when editing) */}
+      {!editing && features.length > 0 && (
+        <ul className="px-5 py-3 flex flex-wrap gap-x-6 gap-y-1">
+          {features.map((f) => (
+            <li key={f} className="flex items-center gap-1.5 text-xs text-white/50">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" width={10} height={10}><path d="M20 6L9 17l-5-5" /></svg>
+              {f}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Edit form */}
+      {editing && (
+        <div className="px-5 py-4">
+          <EditServiceForm plan={plan} onDone={() => setEditing(false)} />
+        </div>
+      )}
+    </div>
   );
 }
 
-function DeleteBtn({ country }: { country: Country }) {
-  const [pending, start] = useTransition();
-  return (
-    <button
-      type="button"
-      disabled={pending}
-      onClick={() => {
-        if (!confirm(`Delete ${country.name}? This removes all its states, documents, and field configs.`)) return;
-        start(async () => { await deleteServiceCountry(country.id); });
-      }}
-      className="px-3 py-1.5 rounded-lg text-xs text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-50"
-      style={{ border: "1px solid rgba(239,68,68,0.2)" }}
-    >
-      {pending ? "…" : "Delete"}
-    </button>
-  );
-}
-
-export default function ServicesClient({ countries }: { countries: Country[] }) {
+export default function ServicesClient({ plans = [] }: { plans: Plan[] }) {
   const [adding, setAdding] = useState(false);
 
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 md:mb-8 pl-10 md:pl-0">
         <div>
-          <h1 className="text-2xl font-bold text-white">Service Countries</h1>
-          <p className="text-sm text-white/45 mt-1">Manage which countries you offer company registration in.</p>
+          <h1 className="text-2xl font-bold text-white">Standalone Services</h1>
+          <p className="text-sm text-white/45 mt-1">Configure standalone services (one-off purchases like Web Development, ITIN, etc).</p>
         </div>
         {!adding && (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white cursor-pointer"
-            style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" width={14} height={14}>
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Add Country
+          <button type="button" onClick={() => setAdding(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white cursor-pointer" style={{ background: "linear-gradient(90deg,#9452E8,#FF5B62)" }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" width={14} height={14}><path d="M12 5v14M5 12h14" /></svg>
+            Add Service
           </button>
         )}
       </div>
 
       {adding && (
         <div className="rounded-xl p-5 mb-6" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)" }}>
-          <p className="text-sm font-semibold text-white mb-4">New Country</p>
-          <AddCountryForm onDone={() => setAdding(false)} />
+          <p className="text-sm font-semibold text-white mb-4">New Service</p>
+          <AddServiceForm onDone={() => setAdding(false)} />
         </div>
       )}
 
-      {countries.length === 0 && !adding ? (
-        <div className="text-center py-20">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" width={40} height={40} className="mx-auto mb-3 text-white/20">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
-          </svg>
-          <p className="text-sm text-white/30">No countries configured yet.</p>
-        </div>
+      {plans.length === 0 && !adding ? (
+        <p className="text-center text-white/25 text-sm py-16">No services yet.</p>
       ) : (
-        <div className="space-y-3">
-          {countries.map((c) => (
-            <div
-              key={c.id}
-              className="flex items-center gap-4 px-5 py-4 rounded-xl"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-            >
-              <div className="shrink-0">
-                <ReactCountryFlag
-                  countryCode={c.isoCode}
-                  svg
-                  style={{ width: "2.2em", height: "2.2em", borderRadius: "5px", border: "1px solid rgba(255,255,255,0.12)" }}
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-white text-sm">{c.name}</span>
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                    style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)" }}
-                  >
-                    {c.isoCode}
-                  </span>
-                  {c.isActive ? (
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: "rgba(16,185,129,0.15)", color: "#34D399" }}>Active</span>
-                  ) : (
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)" }}>Inactive</span>
-                  )}
-                </div>
-                <p className="text-xs text-white/35 mt-0.5">
-                  {c._count.states} state{c._count.states !== 1 ? "s" : ""} · {c._count.documents} doc{c._count.documents !== 1 ? "s" : ""} · {c._count.fields} field{c._count.fields !== 1 ? "s" : ""}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <Link
-                  href={`/admin/services/${c.id}`}
-                  className="px-3 py-1.5 rounded-lg text-xs text-white/60 hover:text-white transition-colors"
-                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)" }}
-                >
-                  Configure
-                </Link>
-                <ToggleBtn country={c} />
-                <DeleteBtn country={c} />
-              </div>
-            </div>
-          ))}
+        <div className="space-y-4">
+          {plans.map((p) => <ServiceCard key={p.id} plan={p} />)}
         </div>
       )}
     </div>

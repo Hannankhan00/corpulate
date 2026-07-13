@@ -59,6 +59,7 @@ type Props = {
   addonItems: AddonItem[]; addonTotal: number;
   total: number; addons: string;
   bankDetails: BankDetailsData;
+  isSubscription: boolean;
 };
 
 // ── Stepper ────────────────────────────────────────────────────────────────
@@ -728,7 +729,7 @@ function PaymentModal({ open, onClose, finalTotal, bankDetails, appData, country
 // ── Main component ─────────────────────────────────────────────────────────
 export default function CheckoutClient({
   country, type, plan, billing, planName, planPrice, planFeatures,
-  state, stateFee, addonItems, total, addons, bankDetails,
+  state, stateFee, addonItems, total, addons, bankDetails, isSubscription,
 }: Props) {
   const [promo, setPromo] = useState<AppliedPromo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -744,7 +745,7 @@ export default function CheckoutClient({
 
   const discountAmount = promo?.discountAmount ?? 0;
   const finalTotal = Math.max(0, total - discountAmount);
-  const billingLabel = billing === "annual" ? "Annual" : "Monthly";
+  const billingLabel = isSubscription ? (billing === "annual" ? "Annual" : "Monthly") : "One-Time";
 
   const fullAppData = {
     ...appData,
@@ -762,10 +763,14 @@ export default function CheckoutClient({
 
         {/* Top progress bar */}
         <div className="flex items-center gap-3 rounded-[50px] pl-12 pr-4 md:px-5 py-3.5 shrink-0" style={{ background: "#1a1a1c", boxShadow: "5px 5px 4px 2px rgba(0,0,0,0.3)" }}>
-          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ background: "linear-gradient(135deg,#7C3AED,#06B6D4)" }}>Q</div>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ background: "linear-gradient(135deg,#7C3AED,#06B6D4)" }}>
+            {isSubscription ? "Q" : "S"}
+          </div>
           <div className="flex-1">
-            <p className="font-semibold text-fg text-sm">Complete your profile</p>
-            <p className="text-xs text-fg-muted mt-0.5">Step 7 of 7 · Payment</p>
+            <p className="font-semibold text-fg text-sm">{isSubscription ? "Complete your profile" : "Complete your purchase"}</p>
+            <p className="text-xs text-fg-muted mt-0.5">
+              {isSubscription ? "Step 7 of 7 · Payment" : "Standalone Service Checkout"}
+            </p>
           </div>
           <div className="flex gap-2">
             <button type="button" className="w-9 h-9 rounded-full flex items-center justify-center text-white border border-white cursor-pointer hover:bg-white/10 transition-colors" style={{ background: "#1a1a1c" }}>
@@ -779,7 +784,7 @@ export default function CheckoutClient({
 
         {/* Content row */}
         <div className="flex gap-5 flex-1 min-h-0">
-          <Stepper current={7} />
+          {isSubscription && <Stepper current={7} />}
 
           <div className="flex-1 flex flex-col xl:flex-row gap-5 min-h-0 overflow-y-auto">
 
@@ -793,7 +798,7 @@ export default function CheckoutClient({
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-white">Order Summary</h3>
-                    <p className="text-[11px] text-white/35 mt-0.5">{planName} · {billingLabel} billing</p>
+                    <p className="text-[11px] text-white/35 mt-0.5">{planName} · {isSubscription ? `${billingLabel} billing` : "One-time purchase"}</p>
                   </div>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md" style={{ background: "rgba(148,82,232,0.15)", color: "#C084FC", border: "1px solid rgba(148,82,232,0.25)" }}>
@@ -804,8 +809,8 @@ export default function CheckoutClient({
               <div className="px-6 py-2">
                 <BillRow
                   icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" width={14} height={14}><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></svg>}
-                  label={`${planName} Plan`}
-                  sub={billing === "annual" ? "Billed annually" : "Billed monthly"}
+                  label={isSubscription ? `${planName} Plan` : planName}
+                  sub={isSubscription ? (billing === "annual" ? "Billed annually" : "Billed monthly") : "One-time payment"}
                   value={`$${planPrice}`}
                 />
                 {stateFee > 0 && state && (
@@ -848,17 +853,17 @@ export default function CheckoutClient({
                   </div>
                   <div className="text-right">
                     <p className="text-3xl font-black text-white">${finalTotal}</p>
-                    {billing === "annual" && <p className="text-[10px] text-white/25 mt-0.5">Billed annually</p>}
+                    {isSubscription && billing === "annual" && <p className="text-[10px] text-white/25 mt-0.5">Billed annually</p>}
                   </div>
                 </div>
               </div>
 
               <div className="px-6 py-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                 <Link
-                  href={`/onboarding/add-ons?country=${country}&type=${type}&plan=${plan}&billing=${billing}&state=${state ?? ""}&stateFee=${stateFee}&addons=${addons}`}
+                  href={isSubscription ? `/onboarding/add-ons?country=${country}&type=${type}&plan=${plan}&billing=${billing}&state=${state ?? ""}&stateFee=${stateFee}&addons=${addons}` : "/dashboard/services"}
                   className="flex items-center gap-2 text-sm text-white/35 hover:text-white/65 transition-colors cursor-pointer w-fit">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={13} height={13}><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
-                  Back to add-ons
+                  {isSubscription ? "Back to add-ons" : "Back to Services"}
                 </Link>
               </div>
             </div>
@@ -877,7 +882,7 @@ export default function CheckoutClient({
                   <p className="text-[11px] text-white/40 uppercase tracking-widest mb-2">Total Due Today</p>
                   {promo && <p className="text-sm text-white/25 line-through mb-0.5">${total}</p>}
                   <p className="text-4xl font-black text-white">${finalTotal}</p>
-                  {billing === "annual" && <p className="text-[10px] text-white/30 mt-1.5">Billed annually — save 20%</p>}
+                  {isSubscription && billing === "annual" && <p className="text-[10px] text-white/30 mt-1.5">Billed annually — save 20%</p>}
                   {promo && <p className="text-xs text-[#10B981] mt-1">You saved ${discountAmount}!</p>}
                 </div>
 

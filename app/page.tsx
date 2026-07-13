@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { login } from "@/app/actions/auth";
@@ -49,11 +49,14 @@ const inputCls =
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined);
   const [showPassword, setShowPassword] = useState(false);
-  const [oauthError] = useState(() =>
-    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("error")
-      ? "Google sign-in failed. Please try again."
-      : ""
-  );
+  const [oauthError, setOauthError] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("error")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOauthError("Google sign-in failed. Please try again.");
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex bg-base">

@@ -56,7 +56,7 @@ export async function createServiceCountry(_prev: unknown, formData: FormData) {
   if (!name || !isoCode) return { error: "Name and ISO code are required." };
   try {
     const country = await prisma.serviceCountry.create({ data: { name, isoCode } });
-    revalidatePath("/admin/services");
+    revalidatePath("/admin/countries");
     revalidatePath("/dashboard");
     return { id: country.id };
   } catch {
@@ -67,14 +67,14 @@ export async function createServiceCountry(_prev: unknown, formData: FormData) {
 export async function toggleServiceCountry(id: string, isActive: boolean) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCountry.update({ where: { id }, data: { isActive } });
-  revalidatePath("/admin/services");
+  revalidatePath("/admin/countries");
   revalidatePath("/dashboard");
 }
 
 export async function deleteServiceCountry(id: string) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCountry.delete({ where: { id } });
-  revalidatePath("/admin/services");
+  revalidatePath("/admin/countries");
   revalidatePath("/dashboard");
 }
 
@@ -97,7 +97,7 @@ export async function addServiceCountryState(_prev: unknown, formData: FormData)
   await prisma.serviceCountryState.create({
     data: { countryId, name, abbr, isFeatured, badge, description, pros, fee },
   });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
   return { ok: true };
 }
 
@@ -119,20 +119,20 @@ export async function updateServiceCountryState(_prev: unknown, formData: FormDa
     where: { id },
     data: { name, abbr, isFeatured, badge, description, pros, fee },
   });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
   return { ok: true };
 }
 
 export async function deleteServiceCountryState(id: string, countryId: string) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCountryState.delete({ where: { id } });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
 }
 
 export async function toggleServiceCountryState(id: string, countryId: string, isActive: boolean) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCountryState.update({ where: { id }, data: { isActive } });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
 }
 
 // ── Documents ─────────────────────────────────────────────────
@@ -146,21 +146,21 @@ export async function addServiceCountryDoc(_prev: unknown, formData: FormData) {
 
   if (!name) return { error: "Document name is required." };
   await prisma.serviceCountryDoc.create({ data: { countryId, name, description, isRequired } });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
   return { ok: true };
 }
 
 export async function deleteServiceCountryDoc(id: string, countryId: string) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCountryDoc.delete({ where: { id } });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
 }
 
 // ── Plans (public) ────────────────────────────────────────────
 
-export async function getActivePlans() {
+export async function getActivePlans(isSubscription = true) {
   return prisma.servicePlan.findMany({
-    where: { isActive: true },
+    where: { isActive: true, isSubscription },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
 }
@@ -172,12 +172,23 @@ export async function getAllPlans() {
   return prisma.servicePlan.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
 }
 
+export async function getSubscriptionPlans() {
+  await requireAdminSession();
+  return prisma.servicePlan.findMany({ where: { isSubscription: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
+}
+
+export async function getStandaloneServices() {
+  await requireAdminSession();
+  return prisma.servicePlan.findMany({ where: { isSubscription: false }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
+}
+
 export async function addPlan(_prev: unknown, formData: FormData) {
   await requireAdminSession("ADMIN");
   const slug              = (formData.get("slug") as string).trim().toLowerCase().replace(/\s+/g, "-");
   const name              = (formData.get("name") as string).trim();
   const monthlyPrice      = parseInt(formData.get("monthlyPrice") as string) || 0;
-  const annualDiscountPct = Math.min(100, Math.max(0, parseInt(formData.get("annualDiscountPct") as string) || 20));
+  const isSubscription    = formData.get("isSubscription") === "true";
+  const annualDiscountPct = isSubscription ? Math.min(100, Math.max(0, parseInt(formData.get("annualDiscountPct") as string) || 20)) : 0;
   const description       = (formData.get("description") as string | null)?.trim() || null;
   const featuresRaw       = (formData.get("features") as string | null)?.trim() || "";
   const features          = JSON.stringify(featuresRaw.split("\n").map((l) => l.trim()).filter(Boolean));
@@ -186,9 +197,23 @@ export async function addPlan(_prev: unknown, formData: FormData) {
 
   if (!slug || !name) return { error: "Slug and name are required." };
   try {
-    await prisma.servicePlan.create({ data: { slug, name, monthlyPrice, annualDiscountPct, description, features, isHighlight, sortOrder } });
+    await prisma.servicePlan.create({
+      data: {
+        slug,
+        name,
+        monthlyPrice,
+        annualDiscountPct,
+        description,
+        features,
+        isHighlight,
+        sortOrder,
+        isSubscription,
+      },
+    });
     revalidatePath("/admin/plans");
+    revalidatePath("/admin/services");
     revalidatePath("/onboarding/plan-selection");
+    revalidatePath("/dashboard/services");
     return { ok: true };
   } catch {
     return { error: "A plan with that slug already exists." };
@@ -200,16 +225,31 @@ export async function updatePlan(_prev: unknown, formData: FormData) {
   const id                = formData.get("id") as string;
   const name              = (formData.get("name") as string).trim();
   const monthlyPrice      = parseInt(formData.get("monthlyPrice") as string) || 0;
-  const annualDiscountPct = Math.min(100, Math.max(0, parseInt(formData.get("annualDiscountPct") as string) || 20));
+  const isSubscription    = formData.get("isSubscription") === "true";
+  const annualDiscountPct = isSubscription ? Math.min(100, Math.max(0, parseInt(formData.get("annualDiscountPct") as string) || 20)) : 0;
   const description       = (formData.get("description") as string | null)?.trim() || null;
   const featuresRaw       = (formData.get("features") as string | null)?.trim() || "";
   const features          = JSON.stringify(featuresRaw.split("\n").map((l) => l.trim()).filter(Boolean));
   const isHighlight       = formData.get("isHighlight") === "true";
   const sortOrder         = parseInt(formData.get("sortOrder") as string) || 0;
 
-  await prisma.servicePlan.update({ where: { id }, data: { name, monthlyPrice, annualDiscountPct, description, features, isHighlight, sortOrder } });
+  await prisma.servicePlan.update({
+    where: { id },
+    data: {
+      name,
+      monthlyPrice,
+      annualDiscountPct,
+      description,
+      features,
+      isHighlight,
+      sortOrder,
+      isSubscription,
+    },
+  });
   revalidatePath("/admin/plans");
+  revalidatePath("/admin/services");
   revalidatePath("/onboarding/plan-selection");
+  revalidatePath("/dashboard/services");
   return { ok: true };
 }
 
@@ -217,6 +257,7 @@ export async function togglePlan(id: string, isActive: boolean) {
   await requireAdminSession("ADMIN");
   await prisma.servicePlan.update({ where: { id }, data: { isActive } });
   revalidatePath("/admin/plans");
+  revalidatePath("/admin/services");
   revalidatePath("/onboarding/plan-selection");
 }
 
@@ -255,7 +296,7 @@ export async function addServiceCompanyType(_prev: unknown, formData: FormData) 
     await prisma.serviceCompanyType.create({
       data: { countryId, slug, name, fullName, description, isPopular, sortOrder },
     });
-    revalidatePath(`/admin/services/${countryId}`);
+    revalidatePath(`/admin/countries/${countryId}`);
     revalidatePath("/onboarding/company-type");
     return { ok: true };
   } catch {
@@ -277,7 +318,7 @@ export async function updateServiceCompanyType(_prev: unknown, formData: FormDat
     where: { id },
     data: { name, fullName, description, isPopular, sortOrder },
   });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
   revalidatePath("/onboarding/company-type");
   return { ok: true };
 }
@@ -285,14 +326,14 @@ export async function updateServiceCompanyType(_prev: unknown, formData: FormDat
 export async function toggleServiceCompanyType(id: string, countryId: string, isActive: boolean) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCompanyType.update({ where: { id }, data: { isActive } });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
   revalidatePath("/onboarding/company-type");
 }
 
 export async function deleteServiceCompanyType(id: string, countryId: string) {
   await requireAdminSession("ADMIN");
   await prisma.serviceCompanyType.delete({ where: { id } });
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
   revalidatePath("/onboarding/company-type");
 }
 
@@ -312,5 +353,5 @@ export async function setServiceCountryField(
       update: { isRequired },
     });
   }
-  revalidatePath(`/admin/services/${countryId}`);
+  revalidatePath(`/admin/countries/${countryId}`);
 }
