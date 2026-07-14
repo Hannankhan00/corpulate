@@ -77,8 +77,8 @@ export default async function DashboardPage() {
     createdAt: a.createdAt.toISOString(),
   }));
 
-  // Find first paid + unsubmitted application to show popup for
-  const pendingInfoApp = applications.find((a) => a.isPaid && !a.infoSubmitted);
+  // Find first paid + unsubmitted application (excluding standalone services) to show popup for
+  const pendingInfoApp = applications.find((a) => a.isPaid && !a.infoSubmitted && a.companyName !== "Standalone Service Purchase");
 
   let pendingInfoData: PendingInfoData | null = null;
 
