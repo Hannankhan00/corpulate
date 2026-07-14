@@ -25,15 +25,6 @@ export async function savePersonalInfo(_prev: unknown, formData: FormData) {
   redirect(`/onboarding/company-type?country=${country}`);
 }
 
-export async function simulatePayment(applicationId: string) {
-  const session = await getSession();
-  if (!session?.userId) redirect("/");
-  await prisma.application.update({
-    where: { id: applicationId, userId: session.userId },
-    data: { isPaid: true },
-  });
-  revalidatePath("/dashboard");
-}
 
 export async function submitApplicationInfo(_prev: unknown, formData: FormData) {
   const session = await getSession();

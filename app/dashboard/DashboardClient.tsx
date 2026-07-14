@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ReactCountryFlag from "react-country-flag";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
 import PostPaymentModal from "./PostPaymentModal";
-import { simulatePayment } from "@/app/actions/application";
 import type { AppSummary, PendingInfoData } from "./page";
 
 // ── Icons ─────────────────────────────────────────────────────
@@ -211,13 +210,10 @@ export default function DashboardClient({
   pendingInfoData: PendingInfoData | null;
 }) {
   const router = useRouter();
-  const [isPaying, startPaying] = useTransition();
-
   const [activeIso, setActiveIso]     = useState(serviceCountries[0]?.isoCode ?? "GB");
   const [modalOpen, setModalOpen]     = useState(false);
   const [modalMode, setModalMode]     = useState<"start" | "change">("start");
   const [pendingIso, setPendingIso]   = useState(activeIso);
-  const [payingId, setPayingId]       = useState<string | null>(null);
 
   const activeMeta = serviceCountries.find((c) => c.isoCode === activeIso) ?? serviceCountries[0];
   const isUS = activeIso === "US";
@@ -333,7 +329,6 @@ export default function DashboardClient({
               {applications.map((app) => {
                 const iso = app.country.toUpperCase();
                 const date = new Date(app.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-                const isThisPaying = isPaying && payingId === app.id;
 
                 return (
                   <div
@@ -371,22 +366,6 @@ export default function DashboardClient({
                         >
                           Info Submitted
                         </span>
-                      )}
-
-                      {/* Simulate payment button for unpaid apps */}
-                      {!app.isPaid && (
-                        <button
-                          type="button"
-                          disabled={isPaying}
-                          onClick={() => {
-                            setPayingId(app.id);
-                            startPaying(() => simulatePayment(app.id));
-                          }}
-                          className="px-4 py-1.5 rounded-full text-xs font-bold text-white cursor-pointer disabled:opacity-50 transition-opacity hover:opacity-80"
-                          style={{ background: "linear-gradient(90deg, #9452E8, #FF5B62)" }}
-                        >
-                          {isThisPaying ? "Processing…" : "Simulate Payment"}
-                        </button>
                       )}
 
                       {/* Paid but not yet submitted */}
